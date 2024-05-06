@@ -1,0 +1,7 @@
+npm install pinia
+npm i vue-toast-notification
+npm install vue bootstrap bootstrap-vue
+npm install vue-router@4
+npm i vue-axios
+npm i @vueuse/core
+npm i @vueuse/components
