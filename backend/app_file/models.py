@@ -20,7 +20,7 @@ def file_upload_to(instance, filename):
 class Folder(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(max_length=100, default='New folder')
-    description = models.TextField(default='')
+    description = models.CharField(max_length=100, default='')
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     permissions = models.CharField(max_length=10, choices=permissions, default='0')
@@ -36,7 +36,7 @@ class Folder(models.Model):
 class File(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     name = models.CharField(max_length=100, default='New file')
-    description = models.TextField(default='')
+    description = models.CharField(max_length=100, default='')
     file = models.FileField(upload_to=file_upload_to)
     size = models.IntegerField(default=0)
     parent = models.ForeignKey(Folder, on_delete=models.CASCADE, null=True)

@@ -21,7 +21,8 @@ class FolderSerializers(serializers.ModelSerializer):
             {
                 'id': str(i.id),
                 'name': i.name,
-                'permissions': i.permissions
+                'permissions': i.permissions,
+                'delete': i.deleted
             } for i in folder
         ]
     
@@ -32,7 +33,8 @@ class FolderSerializers(serializers.ModelSerializer):
                 'id': str(i.id),
                 'name': i.name,
                 'permissions': i.permissions,
-                'file': i.file.url
+                'file': i.file.url,
+                'delete': i.deleted
             } for i in file
         ]
     
@@ -89,7 +91,8 @@ class SavedSerializers(serializers.ModelSerializer):
             {
                 'id': str( i.id),
                 'name': i.name,
-                'permissions': i.permissions
+                'permissions': i.permissions,
+                'delete': i.deleted
             } for i in obj.folder
         ]
     
@@ -99,7 +102,8 @@ class SavedSerializers(serializers.ModelSerializer):
                 'id': str(i.id),
                 'name': i.name,
                 'permissions': i.permissions,
-                'file': i.file.url
+                'file': i.file.url,
+                'delete': i.deleted
             } for i in obj.file
         ]
     

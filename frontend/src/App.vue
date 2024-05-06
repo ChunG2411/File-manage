@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { useToast } from 'vue-toast-notification'
 import { watch } from 'vue'
 import Store from './utils/store.js'
@@ -15,6 +15,9 @@ watch(() => store.toast, (currentvalue, _) => {
   else if (currentvalue.title == 'warning') {
     toast.warning(currentvalue.content);
   }
+  else if (currentvalue.title == 'info') {
+    toast.info(currentvalue.content);
+  }
   else if (currentvalue.title == 'error') {
     toast.error(currentvalue.content);
   }
@@ -29,7 +32,7 @@ watch(() => store.toast, (currentvalue, _) => {
 
   <div class="spin-custom" v-if="store.loading">
     <div class="spinner-border text-primary" role="status">
-      <span class="sr-only">Loading...</span>
+      <!-- <span class="sr-only">Loading...</span> -->
     </div>
   </div>
 

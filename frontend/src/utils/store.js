@@ -20,7 +20,8 @@ const Store = defineStore('store', {
 
         component: {
             title: 'Drive của tôi',
-            url: 'home'
+            url: 'home',
+            reload: true
         },
 
         loading: false,

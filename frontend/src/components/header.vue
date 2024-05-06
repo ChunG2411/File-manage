@@ -9,10 +9,10 @@ const store = Store()
 const input = ref('')
 
 
-function getProfile() {
+async function getProfile() {
     store.loading = true
 
-    axios.get(`${store.api}/api/my-profile`, store.header)
+    await axios.get(`${store.api}/api/my-profile`, store.header)
         .then(response => {
             store.profile = response.data
             store.loading = false

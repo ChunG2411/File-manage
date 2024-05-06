@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import Header from '../components/header.vue'
 import Navbar from '../components/navbar.vue'
 import Card from '../components/card.vue'
@@ -17,7 +17,7 @@ import Card from '../components/card.vue'
 <style scoped>
 .main-content {
     display: flex;
-    gap: 25px;
+    gap: 15px;
     width: 100%;
     height: 100%;
     padding: 10px;

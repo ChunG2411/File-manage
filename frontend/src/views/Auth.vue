@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { ref, reactive } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
@@ -11,7 +11,7 @@ const router = useRouter()
 
 const tab = ref(true)
 const show_pw = ref(false)
-const captcha = ref<string[]>([])
+const captcha = ref([])
 
 const form_signup = reactive({
     email: '',

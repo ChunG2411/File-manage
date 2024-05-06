@@ -1,5 +1,4 @@
-<script setup lang="ts">
-import { ref } from 'vue'
+<script setup>
 import axios from 'axios'
 
 import Store from '../utils/store.js'
@@ -8,10 +7,10 @@ import Store from '../utils/store.js'
 const store = Store()
 
 
-function getLimit() {
+async function getLimit() {
     store.loading = true
 
-    axios.get(`${store.api}/api/limit`, store.header)
+    await axios.get(`${store.api}/api/limit`, store.header)
         .then(response => {
             store.limit = response.data
             store.loading = false
@@ -28,7 +27,7 @@ function getLimit() {
 getLimit()
 
 
-function active(id: String) {
+function active(id) {
     const items = document.querySelectorAll('.nav-item')
     items.forEach(item => {
         if (item.id == id) {
@@ -42,14 +41,17 @@ function active(id: String) {
     if (id == '1') {
         store.component.title = 'Drive của tôi'
         store.component.url = 'home'
+        store.component.reload = true
     }
     else if (id == '2') {
         store.component.title = 'Có gắn dấu sao'
         store.component.url = 'home?type=saved'
+        store.component.reload = true
     }
     else if (id == '3') {
         store.component.title = 'Thùng rác'
         store.component.url = 'home?type=trash'
+        store.component.reload = true
     }
 }
 

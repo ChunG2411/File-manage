@@ -9,7 +9,7 @@ from app_user.views import (
 from app_file.views import(
     HomeView,
     FolderView, FolderDetailView,
-    FileView, downloadFile
+    FileView, FileDetailView, downloadFile
 )
 
 
@@ -34,6 +34,6 @@ urlpatterns = [
 
     path('file', FileView.as_view(), name="FileView-add"),
     path('file/<str:id>', FileView.as_view(), name="FileView"),
-    path('file/<str:id>/detail', FileView.as_view(), name="FileDetailView"),
+    path('file/<str:id>/detail', FileDetailView.as_view(), name="FileDetailView"),
     path('file/<str:id>/download', downloadFile, name="downloadFile"),
 ]

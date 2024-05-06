@@ -106,15 +106,20 @@ class FolderDetailView(APIView):
         return Response(FolderDetailSerializer(folder, context={'request': request}).data, status=200)
 
     def patch(self, request, id):
+        status = request.query_params.get('status')
+
         folder = Folder.objects.get(id=id)
         saved = Saved.objects.get(user=request.user)
 
         if folder.deleted:
             return Response("Restore first", status=400)
 
-        if folder in saved.folder.all():
-            saved.folder.remove(folder)
-            return Response("Unsaved", status=200)
+        if status == 'unsave':
+            if folder in saved.folder.all():
+                saved.folder.remove(folder)
+                return Response("Unsaved", status=200)
+            else:
+                return Response("Unsaved", status=200)
         else:
             saved.folder.add(folder)
             return Response("Saved", status=200)
@@ -122,11 +127,6 @@ class FolderDetailView(APIView):
 
 @permission_classes([permissions.IsAuthenticated])
 class FileView(APIView):
-    def get(self, request, id):
-        file = File.objects.get(id=id)
-        serializer = FileSerializers(file, context={'request': request})
-        return Response(serializer.data, status=200)
-
     def post(self, request):
         parent = request.data.get('parent')
         file_upload = request.FILES.get('file')
@@ -154,6 +154,45 @@ class FileView(APIView):
                                    parent=folder, created_by=request.user)
         limit.save()
         return Response(FileSerializers(file, context={'request': request}).data, status=200)
+
+    def delete(self, request, id):
+        file = File.objects.get(id=id)
+
+        if file.created_by != request.user:
+            return Response("You don't have permission", status=400)
+
+        if file.deleted:
+            file.delete()
+            limit = LimitAction.objects.get(user=request.user)
+            limit.store -= file.size
+            limit.save()
+            return Response("Deleted", status=200)
+        else:
+            saved = Saved.objects.get(user=request.user)
+            if file in saved.file.all():
+                saved.file.remove(file)
+            file.deleted = True
+            file.save()
+            return Response("Move to trash can", status=200)
+
+    def patch(self, request, id):
+        file = File.objects.get(id=id)
+
+        if file.created_by != request.user:
+            return Response("You don't have permission", status=400)
+
+        file.deleted = False
+        file.save()
+        return Response("Restore successful", status=200)
+
+
+@permission_classes([permissions.IsAuthenticated])
+class FileDetailView(APIView):
+    def get(self, request, id):
+        file = File.objects.get(id=id)
+        serializer = FileSerializers(
+            file, context={'request': request})
+        return Response(serializer.data, status=200)
 
     def put(self, request, id):
         name = request.data.get('name')
@@ -183,48 +222,23 @@ class FileView(APIView):
         return Response(FileSerializers(file, context={'request': request}).data, status=200)
 
     def patch(self, request, id):
+        status = request.query_params.get('status')
+
         file = File.objects.get(id=id)
         saved = Saved.objects.get(user=request.user)
 
         if file.deleted:
             return Response("Restore first", status=400)
 
-        if file in saved.file.all():
-            saved.file.remove(file)
-            return Response("Unsaved", status=200)
-        else:
-            saved.file.add(file)
-            return Response("Saved", status=200)
-
-    def delete(self, request, id):
-        file = File.objects.get(id=id)
-
-        if file.created_by != request.user:
-            return Response("You don't have permission", status=400)
-
-        if file.deleted:
-            file.delete()
-            limit = LimitAction.objects.get(user=request.user)
-            limit.store -= file.size
-            limit.save()
-            return Response("Deleted", status=200)
-        else:
-            saved = Saved.objects.get(user=request.user)
+        if status == 'unsave':
             if file in saved.file.all():
                 saved.file.remove(file)
-            file.deleted = True
-            file.save()
-            return Response("Move to trash can", status=200)
-
-    def options(self, request, id):
-        file = File.objects.get(id=id)
-
-        if file.created_by != request.user:
-            return Response("You don't have permission", status=400)
-
-        file.deleted = False
-        file.save()
-        return Response("Restore successful", status=200)
+                return Response("Unsaved", status=200)
+            else:
+                return Response("Unsaved", status=200)
+        else:
+            saved.file.add(file)
+            return Response("Saved", status=200)   
 
 
 @api_view(['GET'])
@@ -247,9 +261,9 @@ def HomeView(request):
 
     if type == 'trash':
         folder = Folder.objects.filter(
-            deleted=True, created_by=request.user, parent=None)
+            deleted=True, created_by=request.user)
         file = File.objects.filter(
-            deleted=True, created_by=request.user, parent=None)
+            deleted=True, created_by=request.user)
     elif type == 'saved':
         saved = Saved.objects.get(user=request.user)
         folder, file = saved.folder.all(), saved.file.all()
@@ -264,12 +278,14 @@ def HomeView(request):
         'folder': [{
                     'id': str(i.id),
                     'name': i.name,
-                    'permissions': i.permissions
+                    'permissions': i.permissions,
+                    'delete': i.deleted
                     } for i in folder],
         'file': [{
             'id': str(i.id),
             'name': i.name,
             'permissions': i.permissions,
-            'file': i.file.url
+            'file': i.file.url,
+            'delete': i.deleted
         } for i in file]
     }, status=200)
