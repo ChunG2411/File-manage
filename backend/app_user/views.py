@@ -10,9 +10,14 @@ from django.utils import timezone
 
 from .models import User, Profile, LimitAction, RequestUpgrate
 from .serializers import UserRegisterSerializers, ProfileSerializers, LimitActionSerializers, RequestUpgrateSerializers
-from manage_file.function import check_validate
+from manage_file.function import check_validate, check_token_blacklisted
 
 # Create your views here.
+
+
+@api_view(['GET'])
+def blacklist_res(request):
+    return Response("Unauthorized", status=401)
 
 
 class RegisterUser(APIView):
@@ -55,23 +60,28 @@ class LoginView(APIView):
 
 
 @permission_classes([permissions.IsAuthenticated])
+@check_token_blacklisted
 class LogoutView(APIView):
-    def get(self, request, *args, **kwargs):
-        if self.request.data.get('all'):
+    def post(self, request):    
+        if request.data.get('all'):
             token: OutstandingToken
             for token in OutstandingToken.objects.filter(user=request.user):
                 _, _ = BlacklistedToken.objects.get_or_create(token=token)
-            return Response(Response("All refresh tokens blacklisted"), status=200)
-        refresh_token = self.request.data.get('refresh_token')
-        try:
-            token = RefreshToken(token=refresh_token)
-            token.blacklist()
-        except:
-            return Response("Token is blacklisted", status=400)
+            return Response("Logout all successful", status=200)
+        # refresh_token = request.data.get('refresh_token')
+        # try:
+        #     token = RefreshToken(token=refresh_token)
+        #     token.blacklist()
+        # except:
+        #     return Response("Token is blacklisted", status=400)
+        token: OutstandingToken
+        for token in OutstandingToken.objects.filter(user=request.user):
+            _, _ = BlacklistedToken.objects.get_or_create(token=token)
         return Response("Logout successful", status=200)
 
 
 @permission_classes([permissions.IsAuthenticated])
+@check_token_blacklisted
 class MyProfileView(APIView):
     def get(self, request):
         try:
@@ -107,17 +117,23 @@ class MyProfileView(APIView):
 
 
 @permission_classes([permissions.IsAuthenticated])
-@api_view(['GET'])
-def ProfileView(request, username):
-    user = User.objects.get(username=username)
-    profile = Profile.objects.get(user=user)
-    serializer = ProfileSerializers(profile)
-    return Response(serializer.data, status=200)
+@check_token_blacklisted
+class ProfileView(APIView):
+    def get(self, request, username):
+        user = User.objects.get(username=username)
+        profile = Profile.objects.get(user=user)
+        serializer = ProfileSerializers(profile)
+        return Response(serializer.data, status=200)
 
 
 @permission_classes([permissions.IsAuthenticated])
+@check_token_blacklisted
 class RequestView(APIView):
     def get(self, request):
+        my_profile = Profile.objects.get(user=request.user)
+        if my_profile.type != '0':
+            return Response("You don't have permission", status=400)
+        
         requests = RequestUpgrate.objects.all()
         pagination = PageNumberPagination()
         page = pagination.paginate_queryset(requests, request)
@@ -161,6 +177,7 @@ class RequestView(APIView):
 
 
 @permission_classes([permissions.IsAuthenticated])
+@check_token_blacklisted
 class LimitView(APIView):
     def get(self, request):
         limit = LimitAction.objects.get(user=request.user)

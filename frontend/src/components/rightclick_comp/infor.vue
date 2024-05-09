@@ -3,7 +3,7 @@ import { ref, watch, defineProps } from 'vue'
 import axios from 'axios'
 
 import Store from '../../utils/store.js'
-import formatDate from '../../utils/functions.js'
+import { formatDate } from '../../utils/functions.js'
 
 
 const store = Store()
@@ -95,6 +95,10 @@ function unsave() {
         <div class="d-flex gap-2 mt-2">
             <b>Mô tả: </b>
             <p>{{ data.description ? data.description : '' }}</p>
+        </div>
+        <div class="d-flex gap-2 mt-2">
+            <b>Kích thước: </b>
+            <p>{{ data.size ? (data.size / 1024).toFixed(2) : '0' }} Mb</p>
         </div>
         <div class="d-flex gap-2 mt-2">
             <b>Người sở hữu: </b>

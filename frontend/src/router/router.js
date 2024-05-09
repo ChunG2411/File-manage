@@ -5,6 +5,7 @@ import Store from '../utils/store'
 import Auth from '../views/Auth.vue'
 import Home from '../views/Home.vue'
 import NotFound from '../views/NotFound.vue'
+import Profile from '../views/Profile.vue'
 
 
 const routes = [
@@ -24,6 +25,15 @@ const routes = [
         meta: {
             requiresAuth: true,
             title: "Của tôi",
+        }
+    },
+    {
+        name: "profile",
+        path: "/profile",
+        component: Profile,
+        meta: {
+            requiresAuth: true,
+            title: "Tài khoản",
         }
     },
     {

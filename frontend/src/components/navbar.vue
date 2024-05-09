@@ -1,10 +1,12 @@
 <script setup>
 import axios from 'axios'
+import { ref } from 'vue';
 
 import Store from '../utils/store.js'
 
 
 const store = Store()
+const showComp = ref('')
 
 
 async function getLimit() {
@@ -41,18 +43,54 @@ function active(id) {
     if (id == '1') {
         store.component.title = 'Drive của tôi'
         store.component.url = 'home'
+        store.component.parent = ''
         store.component.reload = true
     }
     else if (id == '2') {
         store.component.title = 'Có gắn dấu sao'
         store.component.url = 'home?type=saved'
+        store.component.parent = ''
         store.component.reload = true
     }
     else if (id == '3') {
         store.component.title = 'Thùng rác'
         store.component.url = 'home?type=trash'
+        store.component.parent = ''
         store.component.reload = true
     }
+}
+
+function getType() {
+    if (store.profile.type == '0') {
+        return 'quản trị'
+    }
+    else if (store.profile.type == '1') {
+        return 'thường'
+    }
+    else if (store.profile.type == '2') {
+        return 'nâng cấp'
+    }
+}
+
+function sendRequest() {
+    store.loading = true
+
+    axios.patch(`${store.api}/api/my-profile`, {}, store.header)
+        .then(response => {
+            store.loading = false
+            store.toast = {
+                title: 'success',
+                content: 'Đã gửi yêu cầu'
+            }
+            showComp.value = ''
+        })
+        .catch(error => {
+            store.loading = false
+            store.toast = {
+                title: 'error',
+                content: error.response.data
+            }
+        })
 }
 
 </script>
@@ -87,7 +125,7 @@ function active(id) {
             <p>Thùng rác</p>
         </div>
         <div class="d-flex flex-column gap-2 align-items-center">
-            <div class="nav-item" id="4" @click="">
+            <div class="nav-item" id="4" @click="showComp='store'">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                     stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round">
                     <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
@@ -98,12 +136,75 @@ function active(id) {
             </div>
             <div class="progress">
                 <div class="progress-bar bg-info" role="progressbar"
-                    :style="`width: ${(parseFloat(store.limit.store) / parseFloat(store.profile.store)).toFixed(2)}%`"
+                    :style="`width: ${((parseFloat(store.limit.store) / parseFloat(store.profile.store)) * 100).toFixed(2)}%`"
                     aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
-            <p class="fs-7 w-75">Đã sử dụng {{ (parseFloat(store.limit.store) / 1000).toFixed(2) }} Gb trong tổng {{
-            parseFloat(store.profile.store) / 1000 }} Gb</p>
-            <button>Mua thêm bộ nhớ</button>
+            <p class="fs-7 w-75">Đã sử dụng {{ (parseFloat(store.limit.store) / 1024).toFixed(2) }} Mb trong tổng {{
+            (parseFloat(store.profile.store) / 1024).toFixed(2) }} Mb</p>
+            <button @click="showComp='upgrade'">Nâng cấp tài khoản</button>
+        </div>
+
+        <div class="buy" v-if="showComp=='upgrade'">
+            <div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5>Nâng cấp tài khoản</h5>
+                    <div class="icon rec-30" @click="showComp=''">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="#4f4f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </div>
+                </div>
+                <p>Tài khoản của bạn là tài khoản {{ getType() }}</p>
+                <div class="d-flex gap-2 justify-content-end mt-3">
+                    <button class="btn btn-success" v-if="store.profile.type=='1'" @click="sendRequest">Nâng cấp</button>
+                    <button class="btn btn-primary" @click="showComp=''">Xác nhận</button>
+                </div>
+            </div>
+        </div>
+        <div class="buy" v-if="showComp=='store'">
+            <div>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5>Bộ nhớ</h5>
+                    <div class="icon rec-30" @click="showComp=''">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                            stroke="#4f4f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </div>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <th scope="col">Tối đa</th>
+                            <th scope="col">Đã dùng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">Dung lượng</th>
+                            <td>{{ store.profile.store }}</td>
+                            <td>{{ store.limit.store }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Tải lên</th>
+                            <td>{{ store.profile.limit_upload }}</td>
+                            <td>{{ store.limit.upload }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Tải xuống</th>
+                            <td>{{ store.profile.limit_download }}</td>
+                            <td>{{ store.limit.download }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="d-flex gap-2 justify-content-end mt-3">
+                    <button class="btn btn-primary" @click="showComp=''">Xác nhận</button>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -139,5 +240,26 @@ function active(id) {
 .progress {
     height: 7px;
     width: 75%;
+}
+
+.buy {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    background-color: var(--card_background_color);
+    z-index: 50;
+    display: grid;
+    place-items: center;
+}
+
+.buy > div {
+    min-width: 300px;
+    padding: 20px;
+    width: max-content;
+    height: max-content;
+    border-radius: 10px;
+    background-color: var(--card_color);
 }
 </style>

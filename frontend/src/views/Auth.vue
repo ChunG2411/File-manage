@@ -71,8 +71,9 @@ function Signin() {
     form.append('password', form_signin.pass)
 
     axios.post(`${store.api}/api/login`, form)
-        .then(reponse => {
-            localStorage.setItem('token', reponse.data.access)
+        .then(response => {
+            localStorage.setItem('token', response.data.access)
+            store.header.headers.Authorization = `Bearer ${response.data.access}`
             store.is_login = true
 
             store.loading = false
@@ -154,9 +155,9 @@ function Signup() {
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Đăng nhập</button>
-                <div class="fs-7 d-flex gap-1 justify-content-center mt-2">
-                    <p>Chưa có tài khoản:</p>
-                    <b class="pointer" @click="tab = false; get_captcha()">Đăng ký</b>
+                <div class="d-flex gap-1 justify-content-center align-items-center mt-2">
+                    <p class="fs-7">Chưa có tài khoản:</p>
+                    <b class="pointer fs-7" @click="tab = false; get_captcha()">Đăng ký</b>
                 </div>
             </form>
 
@@ -197,9 +198,9 @@ function Signup() {
 
                 </div>
                 <button type="submit" class="btn btn-primary">Đăng ký</button>
-                <div class="fs-7 d-flex gap-1 justify-content-center mt-2">
-                    <p>Đã có tài khoản:</p>
-                    <b class="pointer" @click="tab = true">Đăng nhập</b>
+                <div class="d-flex gap-1 justify-content-center align-items-center mt-2">
+                    <p class="fs-7">Đã có tài khoản:</p>
+                    <b class="pointer fs-7" @click="tab = true">Đăng nhập</b>
                 </div>
             </form>
         </div>

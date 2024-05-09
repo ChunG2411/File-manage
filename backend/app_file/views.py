@@ -6,13 +6,14 @@ from django.http import FileResponse
 
 from .models import Folder, File, Saved
 from .serializers import FolderSerializers, FileSerializers, FolderDetailSerializer
-from manage_file.function import check_validate, get_path_file
+from manage_file.function import check_validate, get_path_file, check_token_blacklisted
 from app_user.models import Profile, LimitAction
 
 # Create your views here.
 
 
 @permission_classes([permissions.IsAuthenticated])
+@check_token_blacklisted
 class FolderView(APIView):
     def get(self, request, id):
         folder = Folder.objects.get(id=id)
@@ -72,6 +73,7 @@ class FolderView(APIView):
 
 
 @permission_classes([permissions.IsAuthenticated])
+@check_token_blacklisted
 class FolderDetailView(APIView):
     def get(self, request, id):
         folder = Folder.objects.get(id=id)
@@ -126,6 +128,7 @@ class FolderDetailView(APIView):
 
 
 @permission_classes([permissions.IsAuthenticated])
+@check_token_blacklisted
 class FileView(APIView):
     def post(self, request):
         parent = request.data.get('parent')
@@ -138,7 +141,7 @@ class FileView(APIView):
         else:
             folder = None
 
-        size = file_upload.size // 1028
+        size = file_upload.size // 1024
         profile = Profile.objects.get(user=request.user)
         limit = LimitAction.objects.get(user=request.user)
 
@@ -187,6 +190,7 @@ class FileView(APIView):
 
 
 @permission_classes([permissions.IsAuthenticated])
+@check_token_blacklisted
 class FileDetailView(APIView):
     def get(self, request, id):
         file = File.objects.get(id=id)
@@ -254,38 +258,59 @@ def downloadFile(request, id):
         return Response("You don't have permission", status=400)
 
 
-@api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])
-def HomeView(request):
-    type = request.query_params.get('type')
+@check_token_blacklisted
+class HomeView(APIView):
+    def get(self, request):
+        type = request.query_params.get('type')
 
-    if type == 'trash':
-        folder = Folder.objects.filter(
-            deleted=True, created_by=request.user)
-        file = File.objects.filter(
-            deleted=True, created_by=request.user)
-    elif type == 'saved':
-        saved = Saved.objects.get(user=request.user)
-        folder, file = saved.folder.all(), saved.file.all()
-    else:
-        folder = Folder.objects.filter(
-            deleted=False, created_by=request.user, parent=None)
-        file = File.objects.filter(
-            deleted=False, created_by=request.user, parent=None)
+        if type == 'trash':
+            folder = Folder.objects.filter(
+                deleted=True, created_by=request.user)
+            file = File.objects.filter(
+                deleted=True, created_by=request.user)
+        elif type == 'saved':
+            saved = Saved.objects.get(user=request.user)
+            folder, file = saved.folder.all(), saved.file.all()
+        else:
+            folder = Folder.objects.filter(
+                deleted=False, created_by=request.user, parent=None)
+            file = File.objects.filter(
+                deleted=False, created_by=request.user, parent=None)
 
-    return Response({
-        'path': '',
-        'folder': [{
+        return Response({
+            'path': '',
+            'folder': [{
+                        'id': str(i.id),
+                        'name': i.name,
+                        'permissions': i.permissions,
+                        'delete': i.deleted,
+                        'update_at': i.updated_at
+                        } for i in folder],
+            'file': [{
+                'id': str(i.id),
+                'name': i.name,
+                'permissions': i.permissions,
+                'file': i.file.url,
+                'delete': i.deleted,
+                'update_at': i.updated_at
+            } for i in file]
+        }, status=200)
+
+
+@permission_classes([permissions.IsAuthenticated])
+@check_token_blacklisted
+class SearchView(APIView):
+    def get(self, request):
+        search = request.query_params.get('search')
+        folder = Folder.objects.filter(name__contains = search.lower())
+
+        return Response({
+            'folder': [{
                     'id': str(i.id),
                     'name': i.name,
                     'permissions': i.permissions,
-                    'delete': i.deleted
-                    } for i in folder],
-        'file': [{
-            'id': str(i.id),
-            'name': i.name,
-            'permissions': i.permissions,
-            'file': i.file.url,
-            'delete': i.deleted
-        } for i in file]
-    }, status=200)
+                    'delete': i.deleted,
+                    'update_at': i.updated_at
+                    } for i in folder]
+        }, status=200)

@@ -10,9 +10,26 @@ import ChangeDes from './rightclick_comp/description.vue'
 import Delete from './rightclick_comp/delete.vue'
 import Move from './rightclick_comp/move/move.vue'
 import Share from './rightclick_comp/share.vue'
+import FilePreveiw from './filePreveiw.vue'
+import Add from './rightclick_comp/add.vue'
+
+import {differentDate} from '../utils/functions.js'
+
 
 const store = Store()
+
+var data_res = {}
 const data = ref(null)
+
+const filter_ext = reactive({
+    ext: '',
+    label: ''
+})
+const filter_time = reactive({
+    time: '',
+    label: ''
+})
+
 const right_click = reactive({
     status: false,
     data: null,
@@ -28,16 +45,73 @@ const showComp = reactive({
 watch(() => store.component.reload, (newValue, _) => {
     if (store.component.reload) {
         showComp.type_com = ''
+        filter_ext.ext = ''
+        filter_ext.label = ''
+        filter_time.time = ''
+        filter_time.label = ''
         getData()
     }
 })
+watch(() => filter_ext.ext, (newValue, _) => {
+    data.value = {...data_res}
+    
+    if (newValue == 'folder') {
+        data.value.file = []
+    }
+    else if (newValue == 'file') {
+        data.value.folder = []
+    }
+    else if (newValue == 'doc') {
+        data.value.folder = []
+        data.value.file = data.value.file.filter((item) => ['doc', 'docx', 'txt'].includes(item.file.split('.').at(-1)))
+    }
+    else if (newValue == 'xls') {
+        data.value.folder = []
+        data.value.file = data.value.file.filter((item) => ['xls', 'xlsx'].includes(item.file.split('.').at(-1)))
+    }
+    else if (newValue == 'png') {
+        data.value.folder = []
+        data.value.file = data.value.file.filter((item) => ['gif', 'jpeg', 'jpg', 'png'].includes(item.file.split('.').at(-1)))
+    }
+    else if (newValue == 'ppt') {
+        data.value.folder = []
+        data.value.file = data.value.file.filter((item) => ['ppt', 'pptx'].includes(item.file.split('.').at(-1)))
+    }
+    else if (newValue == 'zip') {
+        data.value.folder = []
+        data.value.file = data.value.file.filter((item) => ['zip', 'rar'].includes(item.file.split('.').at(-1)))
+    }
+})
+watch(() => filter_time.time, (newValue, _) => {
+    data.value = {...data_res}
 
-function getData() {
+    if (newValue == 'now') {
+        data.value.folder = data.value.folder.filter((item) => differentDate(item.update_at) == 0)
+        data.value.file = data.value.file.filter((item) => differentDate(item.update_at) == 0)
+    }
+    else if (newValue == 'day') {
+        data.value.folder = data.value.folder.filter((item) => differentDate(item.update_at) < 7)
+        data.value.file = data.value.file.filter((item) => differentDate(item.update_at) < 7)
+    }
+    else if (newValue == 'month') {
+        data.value.folder = data.value.folder.filter((item) => differentDate(item.update_at) < 30)
+        data.value.file = data.value.file.filter((item) => differentDate(item.update_at) < 30)
+    }
+    else if (newValue == 'year') {
+        data.value.folder = data.value.folder.filter((item) => differentDate(item.update_at) < 365)
+        data.value.file = data.value.file.filter((item) => differentDate(item.update_at) < 365)
+    }
+})
+
+
+async function getData() {
     store.loading = true
 
-    axios.get(`${store.api}/api/${store.component.url}`, store.header)
+    await axios.get(`${store.api}/api/${store.component.url}`, store.header)
         .then(response => {
-            data.value = response.data
+            data_res = {...response.data}
+            data.value = {...response.data}
+            
             store.loading = false
             store.component.reload = false
         })
@@ -54,6 +128,7 @@ getData()
 
 function getFolder(id) {
     store.component.url = `folder/${id}`
+    store.component.parent = id
     store.component.reload = true
 }
 
@@ -75,6 +150,12 @@ function showComponent(type) {
     showComp.id = right_click.data.id
     showComp.type = right_click.type
     right_click.status = false
+}
+
+function showComponentAdd(type) {
+    showComp.type_com = 'add'
+    showComp.id = store.component.parent
+    showComp.type = type
 }
 
 function DeleteFunc() {
@@ -151,6 +232,17 @@ function downloadFile() {
         })
 }
 
+function changeFilterExt(ext, label) {
+    filter_time.time = ''
+    filter_ext.ext = ext
+    filter_ext.label = label
+}
+function changeFilterTime(time, label) {
+    filter_ext.ext = ''
+    filter_time.time = time
+    filter_time.label = label
+}
+
 </script>
 
 
@@ -185,64 +277,142 @@ function downloadFile() {
                 </div>
             </div>
             <div class="d-flex gap-3 p-2 mt-2">
-                <button>
-                    <p>Loại</p>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none"
-                        stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round">
-                        <path d="M6 9l6 6 6-6" />
-                    </svg>
-                </button>
-                <button>
-                    <p>Lần sửa đổi gần đây</p>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none"
-                        stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round">
-                        <path d="M6 9l6 6 6-6" />
-                    </svg>
-                </button>
+                <div class="btn-drop">
+                    <button>
+                        <p>Thêm mới</p>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none"
+                            stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round">
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
+                    </button>
+                    <div class="btn-drop-content">
+                        <div class="btn-drop-item" @click="showComponentAdd('folder')">
+                            <p>Thư mục</p>
+                        </div>
+                        <div class="btn-drop-item" @click="showComponentAdd('file')">
+                            <p>Tệp</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="btn-drop">
+                    <button>
+                        <p>{{ filter_ext.label ? filter_ext.label : 'Loại' }}</p>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none"
+                            stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round"
+                            v-if="filter_ext.ext==''">
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="#4f4f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            v-else @click="changeFilterExt('', 'Loại')">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    <div class="btn-drop-content">
+                        <div class="btn-drop-item" @click="changeFilterExt('folder', 'Thư mục')">
+                            <p>Thư mục</p>
+                        </div>
+                        <div class="btn-drop-item" @click="changeFilterExt('file', 'Tệp')">
+                            <p>Tệp</p>
+                        </div>
+                        <div class="btn-drop-item" @click="changeFilterExt('doc', 'Tài liệu')">
+                            <p>Tài liệu</p>
+                        </div>
+                        <div class="btn-drop-item" @click="changeFilterExt('xls', 'Bảng tính')">
+                            <p>Bảng tính</p>
+                        </div>
+                        <div class="btn-drop-item" @click="changeFilterExt('png', 'Ảnh')">
+                            <p>Ảnh</p>
+                        </div>
+                        <div class="btn-drop-item" @click="changeFilterExt('ppt', 'Trình bày')">
+                            <p>Trình bày</p>
+                        </div>
+                        <div class="btn-drop-item" @click="changeFilterExt('zip', 'Tệp nén')">
+                            <p>Tệp nén</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="btn-drop">
+                    <button>
+                        <p>{{ filter_time.label ? filter_time.label : 'Gần đây' }}</p>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none"
+                            stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round"
+                            v-if="filter_time.time==''">
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="#4f4f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            v-else @click="changeFilterTime('', 'Gần đây')">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    <div class="btn-drop-content">
+                        <div class="btn-drop-item" @click="changeFilterTime('now', 'Hôm nay')">
+                            <p>Hôm nay</p>
+                        </div>
+                        <div class="btn-drop-item" @click="changeFilterTime('day', '7 ngày')">
+                            <p>7 ngày</p>
+                        </div>
+                        <div class="btn-drop-item" @click="changeFilterTime('month', '1 tháng')">
+                            <p>1 tháng</p>
+                        </div>
+                        <div class="btn-drop-item" @click="changeFilterTime('year', '1 năm')">
+                            <p>1 năm</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+
+        <!-- ---------------------------------------------------content--------------------------------------------------- -->
         <div class="card-content">
             <p class="mt-2 mb-2">Thư mục</p>
             <div class="list-item">
                 <div class="item" v-for="(i, index) in data.folder" @dblclick="getFolder(i.id)"
                     @mouseup.right="showMenu($event, 'folder', i)">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round">
-                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z">
-                        </path>
-                    </svg>
-                    <p>{{ (i.name.length > 10) ? i.name.slice(0, 10) + '...' : i.name }}</p>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round"
-                        @click="showMenu($event, 'folder', i)">
-                        <circle cx="12" cy="12" r="1"></circle>
-                        <circle cx="12" cy="5" r="1"></circle>
-                        <circle cx="12" cy="19" r="1"></circle>
-                    </svg>
+                    <div class="item-header">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z">
+                            </path>
+                        </svg>
+                        <p>{{ (i.name.length > 10) ? i.name.slice(0, 10) + '...' : i.name }}</p>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round"
+                            @click="showMenu($event, 'folder', i)">
+                            <circle cx="12" cy="12" r="1"></circle>
+                            <circle cx="12" cy="5" r="1"></circle>
+                            <circle cx="12" cy="19" r="1"></circle>
+                        </svg>
+                    </div>
                 </div>
             </div>
 
             <p class="mt-4 mb-2">Tệp</p>
             <div class="list-item">
                 <div class="item" v-for="(i, index) in data.file" @mouseup.right="showMenu($event, 'file', i)">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round">
-                        <path d="M13 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V9l-7-7z" />
-                        <path d="M13 3v6h6" />
-                    </svg>
-                    <p>{{ (i.name.length > 10) ? i.name.slice(0, 10) + '...' : i.name }}</p>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round"
-                        @click="showMenu($event, 'file', i)">
-                        <circle cx=" 12" cy="12" r="1"></circle>
-                        <circle cx="12" cy="5" r="1"></circle>
-                        <circle cx="12" cy="19" r="1"></circle>
-                    </svg>
+                    <div class="item-header">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round">
+                            <path d="M13 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V9l-7-7z" />
+                            <path d="M13 3v6h6" />
+                        </svg>
+                        <p>{{ (i.name.length > 10) ? i.name.slice(0, 10) + '...' : i.name }}</p>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round"
+                            @click="showMenu($event, 'file', i)">
+                            <circle cx=" 12" cy="12" r="1"></circle>
+                            <circle cx="12" cy="5" r="1"></circle>
+                            <circle cx="12" cy="19" r="1"></circle>
+                        </svg>
+                    </div>
+                    <FilePreveiw :src="i.file"></FilePreveiw>
                 </div>
             </div>
         </div>
     </div>
-
 
     <!-- --------------------------------------------right click------------------------------------------------------- -->
     <div class="rightclick" v-on-click-outside="closeMenu" v-show="right_click.status">
@@ -359,6 +529,19 @@ function downloadFile() {
             </div>
         </div>
     </Share>
+
+    <Add :type="showComp.type" :id="showComp.id" v-if="showComp.type_com=='add'">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5>Thêm mới {{ (showComp.type == 'folder') ? 'thư mục' : 'tệp tin' }}</h5>
+            <div class="icon rec-30" @click="showComp.type_com = ''">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="#4f4f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </div>
+        </div>
+    </Add>
 </template>
 
 <style scoped>
@@ -384,8 +567,9 @@ function downloadFile() {
 
 .item {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
+    gap: 10px;
     padding: 10px 15px;
     background-color: var(--item_color);
     cursor: pointer;
@@ -399,6 +583,13 @@ function downloadFile() {
     background-color: var(--hover_color);
 }
 
+.item-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 .rightclick {
     position: absolute;
     background-color: var(--card_color);
@@ -410,7 +601,6 @@ function downloadFile() {
     height: max-content;
     display: flex;
     flex-direction: column;
-    gap: 5px;
 }
 
 .item-right {
@@ -441,7 +631,6 @@ function downloadFile() {
     width: max-content;
     height: max-content;
     flex-direction: column;
-    gap: 5px;
     left: 100%;
     top: 0;
 }
