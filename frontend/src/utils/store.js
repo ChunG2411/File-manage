@@ -32,7 +32,8 @@ const Store = defineStore('store', {
         toast: {
             title: '',
             content: ''
-        }
+        },
+        lang: 'vi'
     }),
     actions: {
     }

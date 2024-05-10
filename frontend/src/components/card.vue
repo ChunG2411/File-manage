@@ -461,6 +461,7 @@ function changeFilterTime(time, label) {
         </div>
     </div>
 
+    <!-- --------------------------------------------components---------------------------------------------- -->
     <Transition name="infor">
         <Infor :type="showComp.type" :id="showComp.id" v-if="showComp.type_com == 'infor'">
             <div class="d-flex justify-content-between align-items-center">
@@ -551,6 +552,7 @@ function changeFilterTime(time, label) {
     padding: 10px;
     margin-top: 50px;
     width: 100%;
+    border: 1px solid var(--card_border_color);
 }
 
 .card-content {

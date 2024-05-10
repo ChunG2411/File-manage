@@ -1,3 +1,7 @@
+import vi from '../assets/lang/vi.json' assert {type: 'json'}
+import en from '../assets/lang/en.json' assert {type: 'json'}
+import zh from '../assets/lang/zh.json' assert {type: 'json'}
+
 
 export function formatDate(datetime) {
     const date = datetime.split('T')[0]
@@ -10,4 +14,16 @@ export function differentDate(datetime) {
     const givenDatetime = new Date(datetime)
     const timeDifference = givenDatetime.getTime() - now.getTime()
     return Math.floor(Math.abs(timeDifference) / 1000 / 60 / 60 / 24)
+}
+
+export function getText(lang, file, pos) {
+    if (lang=='zh') {
+        return zh[file][pos]
+    }
+    else if (lang=='en') {
+        return en[file][pos]
+    }
+    else {
+        return vi[file][pos]
+    }
 }

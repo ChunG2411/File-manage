@@ -214,5 +214,6 @@ function Signup() {
     border-radius: 10px;
     width: max-content;
     min-width: 700px;
+    border: 1px solid var(--card_border_color)
 }
 </style>

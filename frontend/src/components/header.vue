@@ -4,6 +4,7 @@ import axios from 'axios'
 import { vOnClickOutside } from '@vueuse/components'
 import { useRouter } from 'vue-router'
 
+import { getText } from '../utils/functions.js'
 import Store from '../utils/store.js'
 
 
@@ -97,6 +98,24 @@ function getFolder(id) {
     store.component.reload = true
 }
 
+function setTheme(theme) {
+    store.loading = true
+    setTimeout(()=>{
+        localStorage.setItem('theme', theme)
+        document.documentElement.className = theme
+        store.loading = false
+    }, 1000)
+}
+
+function setLang(lang) {
+    store.loading = true
+    setTimeout(()=>{
+        localStorage.setItem('lang', lang)
+        store.lang = lang
+        store.loading = false
+    }, 1000)
+}
+
 </script>
 
 <template>
@@ -166,35 +185,35 @@ function getFolder(id) {
                 </div>
                 <div class="header-card" v-if="card=='setting'" v-on-click-outside="closeMenu">
                     <div class="header-card-1 header-card-item">
-                        <p>Giao diện</p>
+                        <p>{{ getText(store.lang, 'header', '1') }}</p>
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                             stroke="#4f4f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M9 18l6-6-6-6"/>
                         </svg>
                         <div class="header-card-2">
-                            <div class="header-card-item">
-                                <p>Sáng</p>
+                            <div class="header-card-item" @click="setTheme('light')">
+                                <p>{{ getText(store.lang, 'header', '2') }}</p>
                             </div>
-                            <div class="header-card-item">
-                                <p>Tối</p>
+                            <div class="header-card-item" @click="setTheme('dark')">
+                                <p>{{ getText(store.lang, 'header', '3') }}</p>
                             </div>
                         </div>
                     </div>
                     <div class="header-card-1 header-card-item">
-                        <p>Ngôn ngữ</p>
+                        <p>{{ getText(store.lang, 'header', '4') }}</p>
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                             stroke="#4f4f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M9 18l6-6-6-6"/>
                         </svg>
                         <div class="header-card-2">
-                            <div class="header-card-item">
-                                <p>Tiếng Anh</p>
+                            <div class="header-card-item" @click="setLang('en')">
+                                <p>{{ getText(store.lang, 'header', '5') }}</p>
                             </div>
-                            <div class="header-card-item">
-                                <p>Tiếng Việt</p>
+                            <div class="header-card-item" @click="setLang('vi')">
+                                <p>{{ getText(store.lang, 'header', '6') }}</p>
                             </div>
-                            <div class="header-card-item">
-                                <p>Tiếng Trung</p>
+                            <div class="header-card-item" @click="setLang('zh')">
+                                <p>{{ getText(store.lang, 'header', '7') }}</p>
                             </div>
                         </div>
                     </div>
@@ -205,20 +224,20 @@ function getFolder(id) {
                 <div class="profile-img rec-30" @click="card='profile'">
                     <img :src="store.api + store.profile.avatar">
                     <div class="profile-abs">
-                        <p class="fs-7">Tài khoản người dùng</p>
+                        <p class="fs-7">{{ getText(store.lang, 'header', '8') }}</p>
                         <p class="fs-7">{{ store.profile.fullname }}</p>
                         <p class="fs-7">{{ store.profile.email }}</p>
                     </div>
                 </div>
                 <div class="header-card" v-if="card=='profile'" v-on-click-outside="closeMenu">
                     <router-link to="/profile" class="header-card-1 header-card-item">
-                        <p>Tài khoản</p>
+                        <p>{{ getText(store.lang, 'header', '9') }}</p>
                     </router-link>
                     <div class="header-card-1 header-card-item" @click="Logout('all')">
-                        <p>Đăng xuất tất cả</p>
+                        <p>{{ getText(store.lang, 'header', '10') }}</p>
                     </div>
                     <div class="header-card-1 header-card-item" @click="Logout('')">
-                        <p>Đăng xuất</p>
+                        <p>{{ getText(store.lang, 'header', '11') }}</p>
                     </div>
                 </div>
             </div>

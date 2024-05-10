@@ -1,7 +1,6 @@
 type_user = [
     ('0','Admin'),
-    ('1','User basic'),
-    ('2','User prenium'),
+    ('1','User')
 ]
 
 permissions = [

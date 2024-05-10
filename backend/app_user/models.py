@@ -63,7 +63,9 @@ class RequestUpgrate(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='RequestUpgrate_user')
     status = models.CharField(choices=status_request, max_length=10, default='0')
-
+    created_at = models.DateTimeField(auto_now_add=True)
+    
     class Meta:
         db_table = 'tb_request'
         verbose_name = 'Yêu cầu nâng cấp'
+        ordering = ['-created_at']

@@ -23,6 +23,27 @@ watch(() => store.toast, (currentvalue, _) => {
   }
 })
 
+// watch(() => store.lang, (currentvalue, _) => {
+//   console.log(store.lang)
+// })
+
+
+if (localStorage.getItem('theme')) {
+  document.documentElement.className = localStorage.getItem('theme')
+}
+else {
+  localStorage.setItem('theme', 'light')
+  document.documentElement.className = 'light'
+}
+
+if (localStorage.getItem('lang')) {
+  store.lang = localStorage.getItem('lang')
+}
+else {
+  localStorage.setItem('lang', 'vi')
+  store.lang = 'vi'
+}
+
 </script>
 
 <template>

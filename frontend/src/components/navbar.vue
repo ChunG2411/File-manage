@@ -64,11 +64,8 @@ function getType() {
     if (store.profile.type == '0') {
         return 'quản trị'
     }
-    else if (store.profile.type == '1') {
-        return 'thường'
-    }
-    else if (store.profile.type == '2') {
-        return 'nâng cấp'
+    else {
+        return 'người dùng'
     }
 }
 
@@ -144,6 +141,7 @@ function sendRequest() {
             <button @click="showComp='upgrade'">Nâng cấp tài khoản</button>
         </div>
 
+        <!-- -----------------------------------------------popup---------------------------------------------------- -->
         <div class="buy" v-if="showComp=='upgrade'">
             <div>
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -158,7 +156,7 @@ function sendRequest() {
                 </div>
                 <p>Tài khoản của bạn là tài khoản {{ getType() }}</p>
                 <div class="d-flex gap-2 justify-content-end mt-3">
-                    <button class="btn btn-success" v-if="store.profile.type=='1'" @click="sendRequest">Nâng cấp</button>
+                    <button class="btn btn-success" v-if="store.profile.type!='0'" @click="sendRequest">Nâng cấp</button>
                     <button class="btn btn-primary" @click="showComp=''">Xác nhận</button>
                 </div>
             </div>
@@ -186,8 +184,8 @@ function sendRequest() {
                     <tbody>
                         <tr>
                             <th scope="row">Dung lượng</th>
-                            <td>{{ store.profile.store }}</td>
-                            <td>{{ store.limit.store }}</td>
+                            <td>{{ (store.profile.store / 1024).toFixed(2) }} Mb</td>
+                            <td>{{ (store.limit.store /1024).toFixed(2) }} Mb</td>
                         </tr>
                         <tr>
                             <th scope="row">Tải lên</th>
@@ -234,7 +232,7 @@ function sendRequest() {
 }
 
 .select-item {
-    background-color: var(--active_color) !important;
+    background-color: var(--active_background_color) !important;
 }
 
 .progress {

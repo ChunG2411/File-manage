@@ -94,6 +94,9 @@ class MyProfileView(APIView):
     def put(self, request):
         fullname = request.data.get('fullname')
         avatar = request.FILES.get('avatar')
+        email = request.data.get('email')
+        old_pass = request.data.get('old_pass')
+        password = request.data.get('password')
 
         profile = Profile.objects.get(user=request.user)
         if fullname:
@@ -102,12 +105,33 @@ class MyProfileView(APIView):
             profile.fullname = fullname
         if avatar:
             profile.avatar = avatar
+        if email:
+            try:
+                User.objects.get(email=email)
+                return Response("Email already exist")
+            except:
+                user = profile.user
+                user.email = email
+                user.save()
+        if password and old_pass:
+            user = profile.user
+            if not user.check_password(old_pass):
+                return Response("Password incorrect", status=400)
+            if password == old_pass:
+                return Response("Enter different password", status=400)
+            user.set_password(password)
+            user.save()
+        else:
+            return Response("Enter password", status=400)
+        
         profile.save()
-
         serializer = ProfileSerializers(profile)
         return Response(serializer.data, status=200)
 
     def patch(self, request):
+        profile = Profile.objects.get(user=request.user)
+        if profile.type != '1':
+            return Response("You dont need upgrade", status=400)
         try:
             RequestUpgrate.objects.get(user=request.user, status='0')
             return Response("Request already exist", status=400)
@@ -138,7 +162,7 @@ class RequestView(APIView):
         pagination = PageNumberPagination()
         page = pagination.paginate_queryset(requests, request)
         serializer = RequestUpgrateSerializers(page, many=True)
-        return Response(serializer.data, status=200)
+        return pagination.get_paginated_response(serializer.data)
 
     def patch(self, request, id):
         r = RequestUpgrate.objects.get(id=id)
@@ -148,12 +172,8 @@ class RequestView(APIView):
         if my_profile.type != '0':
             return Response("You don't have permission", status=400)
 
-        if profile.type != '1':
-            return Response("This user was prenium", status=400)
-
         if r.status == '0':
             r.status = '1'
-            profile.type = '2'
             profile.store += 10000
             profile.limit_upload += 10
             profile.limit_download += 10

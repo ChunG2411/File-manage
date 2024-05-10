@@ -64,6 +64,7 @@ class RequestUpgrateSerializers(serializers.ModelSerializer):
         profile = Profile.objects.get(user=obj.user)
         return {
             'fullname': profile.fullname,
+            'email': profile.user.email,
             'avatar': profile.avatar.url,
             'type': profile.type,
         }
