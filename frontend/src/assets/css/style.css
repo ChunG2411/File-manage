@@ -141,7 +141,7 @@ label {
   color: white;
   max-width: 400px;
   font-size: 15px;
-  padding: 10px !important;
+  padding: 10px 15px !important;
 }
 
 .path {

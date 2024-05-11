@@ -5,3 +5,4 @@ npm install vue-router@4
 npm i vue-axios
 npm i @vueuse/core
 npm i @vueuse/components
+npm install uuid

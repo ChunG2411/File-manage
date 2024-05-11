@@ -1,7 +1,7 @@
 <script setup>
 import Header from '../components/header.vue'
 import Store from '../utils/store.js'
-import { formatDate } from '../utils/functions.js'
+import { formatDate, formatSize } from '../utils/functions.js'
 
 import { reactive, ref } from 'vue'
 import axios from 'axios'
@@ -347,7 +347,7 @@ function getPage(url) {
                         <div class="d-flex align-items-center mb-2">
                             <p class="w-25">Tên</p>
                             <div class="w-75">
-                                <input type="text" class="form-control mt-2" placeholder="Tên" v-model="modify_form.fullname">
+                                <input type="text" class="form-control mt-2" :class="error.fullname ? 'input-error' : ''" placeholder="Tên" @keyup="error.fullname=''" v-model="modify_form.fullname">
                                 <p class="fs-7 text-danger ms-2" v-if="error.fullname">{{ error.fullname }}</p>
                             </div>
                         </div>
@@ -355,7 +355,7 @@ function getPage(url) {
                             <p class="w-25">Email</p>
                             <div class="w-75">
                                 <div class="input-group w-100">
-                                    <input type="text" class="form-control" placeholder="Email" v-model="modify_form.email">
+                                    <input type="text" class="form-control" :class="error.email ? 'input-error' : ''" placeholder="Email" @keyup="error.email=''" v-model="modify_form.email">
                                     <div class="input-group-append">
                                         <span class="input-group-text">@gmail.com</span>
                                     </div>
@@ -383,8 +383,8 @@ function getPage(url) {
                             <tbody>
                                 <tr>
                                     <th scope="row">Dung lượng</th>
-                                    <td>{{ store.profile.store }} Mb</td>
-                                    <td>{{ store.limit.store }} Mb</td>
+                                    <td>{{ formatSize(store.profile.store) }}</td>
+                                    <td>{{ formatSize(store.limit.store) }}</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Tải lên</th>
@@ -466,14 +466,14 @@ function getPage(url) {
                         <div class="d-flex align-items-center mb-2">
                             <p class="w-25">Mật khẩu cũ</p>
                             <div class="w-75">
-                                <input type="text" class="form-control mt-2" placeholder="Mật khẩu cũ" v-model="modify_form.old_pass">
+                                <input type="text" class="form-control mt-2" :class="error.old_pass ? 'input-error' : ''" placeholder="Mật khẩu cũ" @keyup="error.old_pass=''" v-model="modify_form.old_pass">
                                 <p class="fs-7 text-danger ms-2" v-if="error.old_pass">{{ error.old_pass }}</p>
                             </div>
                         </div>
                         <div class="d-flex align-items-center mb-2">
                             <p class="w-25">Mật khẩu mới</p>
                             <div class="w-75">
-                                <input type="text" class="form-control mt-2" placeholder="Mật khẩu mới" v-model="modify_form.password">
+                                <input type="text" class="form-control mt-2" :class="error.password ? 'input-error' : ''" placeholder="Mật khẩu mới" @keyup="error.password=''" v-model="modify_form.password">
                                 <p class="fs-7 text-danger ms-2" v-if="error.password">{{ error.password }}</p>
                             </div>
                         </div>

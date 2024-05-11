@@ -33,6 +33,7 @@ const Store = defineStore('store', {
             title: '',
             content: ''
         },
+        upload: null,
         lang: 'vi'
     }),
     actions: {

@@ -20,6 +20,7 @@ const store = Store()
 
 var data_res = {}
 const data = ref(null)
+const right_card = ref(null)
 
 const filter_ext = reactive({
     ext: '',
@@ -133,9 +134,18 @@ function getFolder(id) {
 }
 
 function showMenu(event, type, data) {
-    const element = document.querySelector('.rightclick')
-    element.style.left = event.clientX + 'px'
-    element.style.top = event.clientY + 'px'
+    if (event.clientX + 170 > window.innerWidth) {
+        right_card.value.style.left = (event.clientX - 170) + 'px'
+    }
+    else {
+        right_card.value.style.left = event.clientX + 'px'
+    }
+    if (event.clientY + 230 > window.innerHeight) {
+        right_card.value.style.top =( event.clientY - 230) + 'px'
+    }
+    else {
+        right_card.value.style.top = event.clientY + 'px'
+    }
     right_click.status = true
     right_click.data = data
     right_click.type = type
@@ -201,11 +211,6 @@ function saveFunc() {
 }
 
 function downloadFile() {
-    store.toast = {
-        title: 'info',
-        content: 'Đang tải xuống'
-    }
-
     axios.get(`${store.api}/api/${right_click.type}/${right_click.data.id}/download`,
                 {
                     responseType: 'blob',
@@ -220,8 +225,8 @@ function downloadFile() {
             link.click()
 
             store.toast = {
-                title: 'success',
-                content: 'Tải xuống hoàn tất'
+                title: 'info',
+                content: 'Đang tải xuống'
             }
         })
         .catch(error => {
@@ -415,7 +420,7 @@ function changeFilterTime(time, label) {
     </div>
 
     <!-- --------------------------------------------right click------------------------------------------------------- -->
-    <div class="rightclick" v-on-click-outside="closeMenu" v-show="right_click.status">
+    <div class="rightclick" ref="right_card" v-on-click-outside="closeMenu" v-show="right_click.status">
         <div class="right-tab-1 item-right" @click="showComponent('infor')">
             <p>Xem thông tin</p>
         </div>
@@ -633,7 +638,7 @@ function changeFilterTime(time, label) {
     width: max-content;
     height: max-content;
     flex-direction: column;
-    left: 100%;
+    right: 100%;
     top: 0;
 }
 

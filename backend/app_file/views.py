@@ -129,7 +129,7 @@ class FolderDetailView(APIView):
 
 @permission_classes([permissions.IsAuthenticated])
 @check_token_blacklisted
-class FileView(APIView):
+class FileView(APIView): 
     def post(self, request):
         parent = request.data.get('parent')
         file_upload = request.FILES.get('file')

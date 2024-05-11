@@ -2,6 +2,7 @@
 import Header from '../components/header.vue'
 import Navbar from '../components/navbar.vue'
 import Card from '../components/card.vue'
+import Upload from '../components/upload.vue'
 
 
 </script>
@@ -11,6 +12,7 @@ import Card from '../components/card.vue'
     <div class="main-content">
         <Navbar />
         <Card />
+        <Upload />
     </div>
 </template>
 

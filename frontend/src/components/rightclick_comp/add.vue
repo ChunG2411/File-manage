@@ -1,6 +1,7 @@
 <script setup>
 import { ref, watch, defineProps } from 'vue'
 import axios from 'axios'
+import { v4 } from 'uuid'
 
 import Store from '../../utils/store.js'
 
@@ -51,6 +52,7 @@ function addFolder() {
 }
 
 function upload_file(e) {
+    show_error.value = ''
     file.value = e.target.files[0]
 }
 
@@ -59,30 +61,30 @@ function addFile() {
         show_error.value = 'Vui lòng thêm tệp'
         return
     }
+    if (file.value.size > 10 * 1024 * 1024) {
+        show_error.value = 'Tệp tải lên tối đa 10Mb'
+        return
+    }
+    if (file.value.size > (parseFloat(store.profile.store) - parseFloat(store.limit.store))) {
+        store.toast = {
+            title: 'error',
+            content: 'Không đủ bộ nhớ'
+        }
+        return
+    }
     store.loading = true
 
     const form = new FormData()
     form.append('parent', props.id)
     form.append('file', file.value)
-
-    axios.post(`${store.api}/api/${props.type}`, form, store.header)
-        .then(response => {
-            store.loading = false
-            store.toast = {
-                title: 'success',
-                content: 'Thêm mới thành công'
-            }
-            store.component.reload = true
-        })
-        .catch(error => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: error.response.data
-            }
-        })
+    
+    const uuid = v4()
+    store.upload = {
+        id: uuid,
+        data: form,
+        name: file.value.name
+    }
 }
-
 
 </script>
 

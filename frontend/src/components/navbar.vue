@@ -3,6 +3,7 @@ import axios from 'axios'
 import { ref } from 'vue';
 
 import Store from '../utils/store.js'
+import { formatSize } from '../utils/functions.js'
 
 
 const store = Store()
@@ -134,10 +135,10 @@ function sendRequest() {
             <div class="progress">
                 <div class="progress-bar bg-info" role="progressbar"
                     :style="`width: ${((parseFloat(store.limit.store) / parseFloat(store.profile.store)) * 100).toFixed(2)}%`"
-                    aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                    aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                </div>
             </div>
-            <p class="fs-7 w-75">Đã sử dụng {{ (parseFloat(store.limit.store) / 1024).toFixed(2) }} Mb trong tổng {{
-            (parseFloat(store.profile.store) / 1024).toFixed(2) }} Mb</p>
+            <p class="fs-7 w-75">Đã sử dụng {{ formatSize(store.limit.store) }} trong tổng {{ formatSize(store.profile.store) }} Mb</p>
             <button @click="showComp='upgrade'">Nâng cấp tài khoản</button>
         </div>
 
@@ -184,8 +185,8 @@ function sendRequest() {
                     <tbody>
                         <tr>
                             <th scope="row">Dung lượng</th>
-                            <td>{{ (store.profile.store / 1024).toFixed(2) }} Mb</td>
-                            <td>{{ (store.limit.store /1024).toFixed(2) }} Mb</td>
+                            <td>{{ formatSize(store.profile.store) }}</td>
+                            <td>{{ formatSize(store.limit.store) }}</td>
                         </tr>
                         <tr>
                             <th scope="row">Tải lên</th>
