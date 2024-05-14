@@ -62,7 +62,7 @@ function submit() {
                 title: 'success',
                 content: 'Đổi tên thành công'
             }
-            store.component.reload = true
+            store.reload = true
         })
         .catch(_ => {
             store.loading = false

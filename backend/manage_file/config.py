@@ -3,6 +3,11 @@ type_user = [
     ('1','User')
 ]
 
+status_user = [
+    ('0', 'Not actived'),
+    ('1', 'actived')
+]
+
 permissions = [
     ('0','private'),
     ('1','public')

@@ -53,7 +53,7 @@ function submit() {
                 title: 'success',
                 content: 'Thay đổi thành công'
             }
-            store.component.reload = true
+            store.reload = true
         })
         .catch(_ => {
             store.loading = false

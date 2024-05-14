@@ -4,7 +4,7 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core import validators
 
 from .managers import CustomUserManager
-from manage_file.config import type_user, status_request
+from manage_file.config import type_user, status_request, status_user
 import uuid
 import os
 
@@ -38,7 +38,7 @@ class Profile(models.Model):
     fullname = models.CharField(max_length=100, default='')
     avatar = models.ImageField(upload_to=file_upload_to, null=True, blank=True,  default='user.png')
     type = models.CharField(choices=type_user, max_length=10, default='1')
-    store = models.IntegerField(default=1000) #1Gb
+    store = models.IntegerField(default=10000)
     limit_upload = models.IntegerField(default=5)
     limit_download = models.IntegerField(default=5)
 
@@ -69,3 +69,13 @@ class RequestUpgrate(models.Model):
         db_table = 'tb_request'
         verbose_name = 'Yêu cầu nâng cấp'
         ordering = ['-created_at']
+
+
+class EmailCode(models.Model):
+    email_validator = validators.validate_email
+    email = models.EmailField(validators=[email_validator])
+    code = models.CharField(max_length=5)
+
+    class Meta:
+        db_table = 'tb_email_code'
+        verbose_name = 'Mã xác thực'

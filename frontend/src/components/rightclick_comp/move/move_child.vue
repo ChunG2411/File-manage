@@ -48,7 +48,7 @@ function moveTo(id) {
                 title: 'success',
                 content: 'Chuyển thành công'
             }
-            store.component.reload = true
+            store.reload = true
         })
         .catch(_ => {
             store.loading = false

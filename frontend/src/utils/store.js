@@ -20,13 +20,8 @@ const Store = defineStore('store', {
         limit: {
             store: ''
         },
-
-        component: {
-            title: 'Drive của tôi',
-            url: 'home',
-            parent: '',
-            reload: true
-        },
+        
+        reload: false,
 
         loading: false,
         toast: {

@@ -2,6 +2,7 @@
 import { ref, watch, reactive, Transition } from 'vue'
 import axios from 'axios'
 import { vOnClickOutside } from '@vueuse/components'
+import { useRoute, useRouter } from 'vue-router'
 
 import Store from '../utils/store.js'
 import Infor from './rightclick_comp/infor.vue'
@@ -12,11 +13,14 @@ import Move from './rightclick_comp/move/move.vue'
 import Share from './rightclick_comp/share.vue'
 import FilePreveiw from './filePreveiw.vue'
 import Add from './rightclick_comp/add.vue'
+import Preveiw from './preview/preveiw.vue'
 
 import {differentDate} from '../utils/functions.js'
 
 
 const store = Store()
+const route = useRoute()
+const router = useRouter()
 
 var data_res = {}
 const data = ref(null)
@@ -41,18 +45,32 @@ const showComp = reactive({
     id: '',
     type: ''
 })
+const showPreveiw = reactive({
+    status: false,
+    data: null
+})
 
 
-watch(() => store.component.reload, (newValue, _) => {
-    if (store.component.reload) {
+watch(() => store.reload, (newValue, _) => {
+    if (newValue) {
         showComp.type_com = ''
         filter_ext.ext = ''
         filter_ext.label = ''
         filter_time.time = ''
         filter_time.label = ''
-        getData()
+        getData(route.path)
     }
 })
+watch(() => route.path, (newId, oldId) => {
+    showComp.type_com = ''
+    filter_ext.ext = ''
+    filter_ext.label = ''
+    filter_time.time = ''
+    filter_time.label = ''
+    getData(newId)
+})
+
+
 watch(() => filter_ext.ext, (newValue, _) => {
     data.value = {...data_res}
     
@@ -105,16 +123,16 @@ watch(() => filter_time.time, (newValue, _) => {
 })
 
 
-async function getData() {
+async function getData(path) {
     store.loading = true
 
-    await axios.get(`${store.api}/api/${store.component.url}`, store.header)
+    await axios.get(`${store.api}/api${path}`, store.header)
         .then(response => {
             data_res = {...response.data}
             data.value = {...response.data}
             
             store.loading = false
-            store.component.reload = false
+            store.reload = false
         })
         .catch(_ => {
             store.loading = false
@@ -124,17 +142,15 @@ async function getData() {
             }
         })
 }
+getData(route.path)
 
-getData()
 
 function getFolder(id) {
-    store.component.url = `folder/${id}`
-    store.component.parent = id
-    store.component.reload = true
+    router.push({ name: 'card_folder', params: { id } })
 }
 
 function showMenu(event, type, data) {
-    if (event.clientX + 170 > window.innerWidth) {
+    if (event.clientX + 190 > window.innerWidth) {
         right_card.value.style.left = (event.clientX - 170) + 'px'
     }
     else {
@@ -164,8 +180,21 @@ function showComponent(type) {
 
 function showComponentAdd(type) {
     showComp.type_com = 'add'
-    showComp.id = store.component.parent
+    if (route.name == 'card_folder') {
+        showComp.id = route.params.id
+    }
+    else {
+        showComp.id = ''
+    }   
     showComp.type = type
+    console.log(showComp);
+}
+
+function showPreveiwFunc(data) {
+    right_click.type = 'file'
+    right_click.data = data
+    showPreveiw.status = true
+    showPreveiw.data = data
 }
 
 function DeleteFunc() {
@@ -178,8 +207,7 @@ function DeleteFunc() {
                 content: 'Xoá thành công'
             }
             store.loading = false
-            store.component.reload = true
-            showComp.type_com = ''
+            store.reload = true
         })
         .catch(_ => {
             store.loading = false
@@ -256,7 +284,11 @@ function changeFilterTime(time, label) {
         <div class="c-header">
             <div>
                 <div class="d-flex align-items-center">
-                    <h5 class="path">{{ (data.path.length > 0) ? '...' : store.component.title }}</h5>
+                    <h5 class="path">{{ (data.path.length > 0) ? '...' :
+                        route.params.type ? (route.params.type == 'saved') ? 'Có gắn dấu sao' :
+                        (route.params.type == 'trash') ? 'Thùng rác' :
+                        'Drive của tôi' : 'Drive của tôi'
+                    }}</h5>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                         stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round">
                         <path d="M9 18l6-6-6-6" />
@@ -397,7 +429,8 @@ function changeFilterTime(time, label) {
 
             <p class="mt-4 mb-2">Tệp</p>
             <div class="list-item">
-                <div class="item" v-for="(i, index) in data.file" @mouseup.right="showMenu($event, 'file', i)">
+                <div class="item" v-for="(i, index) in data.file" @dblclick="showPreveiwFunc(i)"
+                    @mouseup.right="showMenu($event, 'file', i)">
                     <div class="item-header">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                             stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round">
@@ -548,6 +581,12 @@ function changeFilterTime(time, label) {
             </div>
         </div>
     </Add>
+
+    <Preveiw :data="showPreveiw.data" :showClose="true" v-if="showPreveiw.status"
+        @click-close="showPreveiw.status=false"
+        @click-save="saveFunc"
+        @click-download="downloadFile">
+    </Preveiw>
 </template>
 
 <style scoped>

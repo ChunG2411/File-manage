@@ -62,6 +62,7 @@ class FileSerializers(serializers.ModelSerializer):
     created_by = serializers.SerializerMethodField()
     path = serializers.SerializerMethodField()
     saved = serializers.SerializerMethodField()
+    file = serializers.SerializerMethodField()
 
     class Meta:
         model = File
@@ -72,6 +73,9 @@ class FileSerializers(serializers.ModelSerializer):
     
     def get_created_by(self, obj):
         return obj.created_by.username
+    
+    def get_file(self, obj):
+        return obj.file.url
     
     def get_saved(self, obj):
         saved = Saved.objects.get(user=self.context['request'].user)

@@ -1,13 +1,4 @@
 <script setup>
-import { ref, watch, defineProps } from 'vue'
-import axios from 'axios'
-
-import Store from '../../utils/store.js'
-
-
-const store = Store()
-
-
 </script>
 
 <template>

@@ -17,10 +17,10 @@ const search_data = ref(null)
 const card = ref('')
 
 
-async function getProfile() {
+function getProfile() {
     store.loading = true
 
-    await axios.get(`${store.api}/api/my-profile`, store.header)
+    axios.get(`${store.api}/api/my-profile`, store.header)
         .then(response => {
             store.profile = response.data
             store.loading = false
@@ -93,9 +93,7 @@ function getFolder(id) {
     input.value = ''
     search_data.value = null
     card.value = null
-    store.component.url = `folder/${id}`
-    store.component.parent = id
-    store.component.reload = true
+    router.push({ name: 'card_folder', params: { id } })
 }
 
 function setTheme(theme) {
@@ -120,7 +118,7 @@ function setLang(lang) {
 
 <template>
     <div class="header">
-        <router-link to="/" class="d-flex gap-2 align-items-center pointer">
+        <router-link to="/home" class="d-flex gap-2 align-items-center pointer">
             <div class="logo rec-40">
                 <img src="../assets/image/logo.png">
             </div>

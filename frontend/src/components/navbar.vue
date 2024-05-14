@@ -1,12 +1,15 @@
 <script setup>
 import axios from 'axios'
 import { ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router'
 
 import Store from '../utils/store.js'
 import { formatSize } from '../utils/functions.js'
 
 
 const store = Store()
+const router = useRouter()
+
 const showComp = ref('')
 
 
@@ -42,22 +45,13 @@ function active(id) {
     })
 
     if (id == '1') {
-        store.component.title = 'Drive của tôi'
-        store.component.url = 'home'
-        store.component.parent = ''
-        store.component.reload = true
+        router.push({name: 'card_type', params: {type: 'home'}})
     }
     else if (id == '2') {
-        store.component.title = 'Có gắn dấu sao'
-        store.component.url = 'home?type=saved'
-        store.component.parent = ''
-        store.component.reload = true
+        router.push({name: 'card_type', params: {type: 'saved'}})
     }
     else if (id == '3') {
-        store.component.title = 'Thùng rác'
-        store.component.url = 'home?type=trash'
-        store.component.parent = ''
-        store.component.reload = true
+        router.push({name: 'card_type', params: {type: 'trash'}})
     }
 }
 
@@ -138,7 +132,7 @@ function sendRequest() {
                     aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
                 </div>
             </div>
-            <p class="fs-7 w-75">Đã sử dụng {{ formatSize(store.limit.store) }} trong tổng {{ formatSize(store.profile.store) }} Mb</p>
+            <p class="fs-7 w-75">Đã sử dụng {{ formatSize(store.limit.store) }} trong tổng {{ formatSize(store.profile.store) }}</p>
             <button @click="showComp='upgrade'">Nâng cấp tài khoản</button>
         </div>
 
@@ -214,6 +208,8 @@ function sendRequest() {
     flex-direction: column;
     gap: 5px;
     margin-top: 70px;
+    min-width: 200px;
+    max-width: 200px;
 }
 
 .nav-item {
@@ -224,8 +220,6 @@ function sendRequest() {
     border-radius: 10px;
     cursor: pointer;
     width: 100%;
-    min-width: 200px;
-    max-width: 250px;
 }
 
 .nav-item:hover {

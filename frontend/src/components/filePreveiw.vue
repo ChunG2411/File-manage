@@ -33,6 +33,12 @@ function checkFormat(name) {
     else if(['doc', 'docx', 'txt'].includes(end)){
         file_format.value = 'doc'
     }
+    else if(['mp4'].includes(end)){
+        file_format.value = 'video'
+    }
+    else if(['pdf'].includes(end)){
+        file_format.value = 'pdf'
+    }
     else {
         file_format.value = 'file'
     }
@@ -48,6 +54,8 @@ checkFormat(props.src)
         <img src="../assets/image/zip.png" v-else-if="file_format == 'zip'"/>
         <img src="../assets/image/xls.png" v-else-if="file_format == 'xls'"/>
         <img src="../assets/image/ppt.png" v-else-if="file_format == 'ppt'"/>
+        <img src="../assets/image/video.png" v-else-if="file_format == 'video'"/>
+        <img src="../assets/image/pdf.png" v-else-if="file_format == 'pdf'"/>
         <img src="../assets/image/file.png" v-else/>
     </div>
 </template>

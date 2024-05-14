@@ -6,11 +6,16 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.pagination import PageNumberPagination
-from django.utils import timezone
 
-from .models import User, Profile, LimitAction, RequestUpgrate
-from .serializers import UserRegisterSerializers, ProfileSerializers, LimitActionSerializers, RequestUpgrateSerializers
+# from django.core.mail import send_mail
+from django.utils import timezone
+# from django.conf import settings
+from random import randint, choice
+
+from .models import User, Profile, LimitAction, RequestUpgrate, EmailCode
+from .serializers import UserRegisterSerializers, ProfileSerializers, LimitActionSerializers, RequestUpgrateSerializers, EmailCodeSerializers
 from manage_file.function import check_validate, check_token_blacklisted
+# from .task import send_email_task
 
 # Create your views here.
 
@@ -20,8 +25,47 @@ def blacklist_res(request):
     return Response("Unauthorized", status=401)
 
 
+class GetCode(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        if check_validate(email):
+            return Response("Email không hợp lệ", status=400)
+        
+        code_char = ''
+        for _ in range(5):
+            code_asscii = choice([randint(48,57),randint(65,90),randint(97,122)])
+            code_char += chr(code_asscii)
+        try:
+            code = EmailCode.objects.get(email=email + '@gmail.com')
+            code.code = code_char
+            code.save()
+        except:
+            code = EmailCode.objects.create(email=email + '@gmail.com', code=code_char)
+
+        # send_mail(
+        #     "Register Code",
+        #     "Please enter this code to register page: {}".format(code_char),
+        #     settings.EMAIL_HOST_USER,
+        #     ['{}@gmail.com'.format(email)]
+        # )
+        # send_email_task.delay(email, code_char)
+
+        serializer = EmailCodeSerializers(code)
+        return Response(serializer.data, status=200)
+
+
 class RegisterUser(APIView):
     def post(self, request):
+        code = request.data.get('code')
+        email = request.data.get('email')
+
+        try:
+            email_code = EmailCode.objects.get(email=email)
+            if email_code.code != code:
+                return Response("Code is wrong", status=400)
+        except:
+            return Response("Check code have been send to your email", status=400)
+        
         serializer = UserRegisterSerializers(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -148,6 +192,15 @@ class ProfileView(APIView):
         profile = Profile.objects.get(user=user)
         serializer = ProfileSerializers(profile)
         return Response(serializer.data, status=200)
+    
+    def delete(self, request, username):
+        my_profile = Profile.objects.get(user=request.user)
+        if my_profile.type != '0':
+            return Response("You don't have permission", status=400)
+
+        user = User.objects.get(username=username)
+        user.delete()
+        return Response("Deleted successful", status=200)
 
 
 @permission_classes([permissions.IsAuthenticated])

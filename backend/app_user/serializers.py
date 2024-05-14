@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from .models import (
-    User, Profile, LimitAction, RequestUpgrate
+    User, Profile, LimitAction, RequestUpgrate, EmailCode
 )
 from app_file.models import Saved
 
@@ -68,3 +68,9 @@ class RequestUpgrateSerializers(serializers.ModelSerializer):
             'avatar': profile.avatar.url,
             'type': profile.type,
         }
+    
+
+class EmailCodeSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = EmailCode
+        fields = '__all__'

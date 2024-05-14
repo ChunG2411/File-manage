@@ -1,9 +1,12 @@
 <script setup>
 import Header from '../components/header.vue'
 import Navbar from '../components/navbar.vue'
-import Card from '../components/card.vue'
 import Upload from '../components/upload.vue'
 
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+router.push({name: 'card'})
 
 </script>
 
@@ -11,7 +14,7 @@ import Upload from '../components/upload.vue'
     <Header />
     <div class="main-content">
         <Navbar />
-        <Card />
+        <router-view></router-view>
         <Upload />
     </div>
 </template>

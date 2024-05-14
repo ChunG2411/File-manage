@@ -247,12 +247,15 @@ class FileDetailView(APIView):
 
 @api_view(['GET'])
 def downloadFile(request, id):
+    limit = LimitAction.objects.get(user=request.user)
     file = File.objects.get(id=id)
     if file.permissions == '1' or file.created_by == request.user:
         file_read = open(get_path_file(file.file.url), 'rb')
         response = FileResponse(file_read)
         response['Content-Type'] = 'application/octet-stream'
         response['Content-Disposition'] = 'attachment; filename="{}"'.format(file.name)
+        limit.download += 1
+        limit.save()
         return response
     else:
         return Response("You don't have permission", status=400)

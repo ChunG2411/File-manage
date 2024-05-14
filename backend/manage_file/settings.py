@@ -68,18 +68,7 @@ ROOT_URLCONF = 'manage_file.urls'
 
 # CORS
 CORS_ALLOW_ALL_ORIGINS = True
-# CORS_ALLOW_HEADERS = [
-#     "refresh",
-#     "authorization"
-# ]
-# CORS_ALLOW_METHODS = [
-#     "DELETE",
-#     "GET",
-#     "OPTIONS",
-#     "PATCH",
-#     "POST",
-#     "PUT",
-# ]
+
 
 TEMPLATES = [
     {
@@ -174,6 +163,18 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# Celery
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
+
+# Email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'daochung2k@gmail.com'
+EMAIL_HOST_PASSWORD = 'uitu pwas zxnz mcdq'
 
 
 # Internationalization

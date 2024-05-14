@@ -41,7 +41,7 @@ function upload(data) {
                 title: 'success',
                 content: 'Tải lên thành công'
             }
-            store.component.reload = true
+            store.reload = true
         })
         .catch(error => {
             process.value.forEach(item => {

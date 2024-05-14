@@ -50,7 +50,7 @@ function restore() {
                 content: 'Đã khôi phục'
             }
             store.loading = false
-            store.component.reload = true
+            store.reload = true
         })
         .catch(_ => {
             store.loading = false
@@ -71,7 +71,7 @@ function unsave() {
                 content: 'Đã bỏ dấu sao'
             }
             store.loading = false
-            store.component.reload = true
+            store.reload = true
         })
         .catch(error => {
             store.loading = false

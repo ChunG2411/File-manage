@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, defineProps } from 'vue'
+import { ref, defineProps } from 'vue'
 import axios from 'axios'
 import { v4 } from 'uuid'
 
@@ -40,7 +40,7 @@ function addFolder() {
                 title: 'success',
                 content: 'Thêm mới thành công'
             }
-            store.component.reload = true
+            store.reload = true
         })
         .catch(error => {
             store.loading = false
@@ -61,11 +61,11 @@ function addFile() {
         show_error.value = 'Vui lòng thêm tệp'
         return
     }
-    if (file.value.size > 10 * 1024 * 1024) {
-        show_error.value = 'Tệp tải lên tối đa 10Mb'
+    if (file.value.size > 100 * 1024 * 1024) {
+        show_error.value = 'Tệp tải lên tối đa 100Mb'
         return
     }
-    if (file.value.size > (parseFloat(store.profile.store) - parseFloat(store.limit.store))) {
+    if (file.value.size / 1024 > (parseFloat(store.profile.store) - parseFloat(store.limit.store))) {
         store.toast = {
             title: 'error',
             content: 'Không đủ bộ nhớ'

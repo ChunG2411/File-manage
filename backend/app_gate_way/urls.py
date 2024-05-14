@@ -1,7 +1,7 @@
 from django.urls import path
 
 from app_user.views import (
-    RegisterUser, LoginView, LogoutView,
+    RegisterUser, LoginView, LogoutView, GetCode,
     MyProfileView, ProfileView, RequestView,
     LimitView,
     EmailView,
@@ -20,8 +20,10 @@ urlpatterns = [
     path('logout', LogoutView.as_view(), name="LogoutView"),
     path('token-blacklist', blacklist_res, name="blacklist_res"),
 
+    path('get-code', GetCode.as_view(), name="GetCode"),
     path('my-profile', MyProfileView.as_view(), name="MyProfileView"),
     path('profile/<str:username>', ProfileView.as_view(), name="ProfileView"),
+    path('profile/<str:username>/delete', ProfileView.as_view(), name="ProfileView-delete"),
 
     path('request', RequestView.as_view(), name="RequestView"),
     path('request/<str:id>', RequestView.as_view(), name="RequestView-action"),
