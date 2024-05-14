@@ -15,7 +15,7 @@ from random import randint, choice
 from .models import User, Profile, LimitAction, RequestUpgrate, EmailCode
 from .serializers import UserRegisterSerializers, ProfileSerializers, LimitActionSerializers, RequestUpgrateSerializers, EmailCodeSerializers
 from manage_file.function import check_validate, check_token_blacklisted
-# from .task import send_email_task
+from .task import send_email_task
 
 # Create your views here.
 
@@ -42,13 +42,7 @@ class GetCode(APIView):
         except:
             code = EmailCode.objects.create(email=email + '@gmail.com', code=code_char)
 
-        # send_mail(
-        #     "Register Code",
-        #     "Please enter this code to register page: {}".format(code_char),
-        #     settings.EMAIL_HOST_USER,
-        #     ['{}@gmail.com'.format(email)]
-        # )
-        # send_email_task.delay(email, code_char)
+        send_email_task.delay(email, code_char)
 
         serializer = EmailCodeSerializers(code)
         return Response(serializer.data, status=200)
