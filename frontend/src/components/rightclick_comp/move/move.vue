@@ -4,6 +4,7 @@ import axios from 'axios'
 
 import Store from '../../../utils/store.js'
 import Child from './move_child.vue'
+import { checkError } from '../../../utils/functions.js'
 
 
 const store = Store()
@@ -23,12 +24,8 @@ function getData() {
             data.value = response.data.folder
             store.loading = false
         })
-        .catch(_ => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: 'Vui lòng tải lại trang'
-            }
+        .catch(error => {
+            checkError(error)
         })
 }
 getData()
@@ -49,12 +46,8 @@ function moveToHome() {
             }
             store.reload = true
         })
-        .catch(_ => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: 'Vui lòng tải lại trang'
-            }
+        .catch(error => {
+            checkError(error)
         })
 }
 

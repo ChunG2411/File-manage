@@ -90,7 +90,8 @@ router.beforeEach((to,_, next) => {
     }
 
     if (to.matched.some(record => record.meta.requiresAuth)) {
-        if (!store.is_login) {            
+        if (!store.is_login) {
+            store.pre_router = to.path
             next({ name: 'login' })
         } else {
             next()

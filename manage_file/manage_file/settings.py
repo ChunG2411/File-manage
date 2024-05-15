@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 import datetime
 from pathlib import Path
+from celery.schedules import crontab
 
 from django.conf import settings
 
@@ -166,8 +167,14 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Celery
-CELERY_BROKER_URL = "redis://localhost:6379"
-CELERY_RESULT_BACKEND = "redis://localhost:6379"
+CELERY_BROKER_URL = "redis://127.0.0.1:6379"
+CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379"
+CELERY_BEAT_SCHEDULE = {
+    'Task_reset_limit_schedule' : {
+        'task': 'app_user.task.reset_limit',
+        'schedule': crontab(minute=1, hour=0),
+    }
+}
 
 # Email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

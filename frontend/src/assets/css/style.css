@@ -158,6 +158,11 @@ label {
   border-color: red;
 }
 
+.input-group-text {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
 .bg-red {
   padding: 0 5px;
   border-radius: 10px;
@@ -270,6 +275,7 @@ button {
   padding: 5px 10px;
   width: max-content;
   height: max-content;
+  min-width: max-content;
 }
 
 button:hover {

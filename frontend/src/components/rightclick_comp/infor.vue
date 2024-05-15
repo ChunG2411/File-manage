@@ -3,7 +3,7 @@ import { ref, watch, defineProps } from 'vue'
 import axios from 'axios'
 
 import Store from '../../utils/store.js'
-import { formatDate } from '../../utils/functions.js'
+import { formatDate, checkError } from '../../utils/functions.js'
 
 
 const store = Store()
@@ -28,12 +28,8 @@ function getDetail() {
             data.value = response.data
             store.loading = false
         })
-        .catch(_ => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: 'Vui lòng tải lại trang'
-            }
+        .catch(error => {
+            checkError(error)
         })
 }
 
@@ -52,12 +48,8 @@ function restore() {
             store.loading = false
             store.reload = true
         })
-        .catch(_ => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: 'Vui lòng tải lại trang'
-            }
+        .catch(error => {
+            checkError(error)
         })
 }
 
@@ -74,11 +66,7 @@ function unsave() {
             store.reload = true
         })
         .catch(error => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: error.response.data
-            }
+            checkError(error)
         })
 }
 

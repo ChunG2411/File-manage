@@ -4,6 +4,7 @@ import axios from 'axios'
 import { v4 } from 'uuid'
 
 import Store from '../../utils/store.js'
+import { checkError } from '../../utils/functions.js'
 
 
 const store = Store()
@@ -43,11 +44,7 @@ function addFolder() {
             store.reload = true
         })
         .catch(error => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: error.response.data
-            }
+            checkError(error)
         })
 }
 
@@ -92,7 +89,8 @@ function addFile() {
     <div class="add">
         <div v-if="props.type == 'folder'">
             <slot></slot>
-            <input class="form-control mt-3" :class="show_error ? 'input-error' : ''" type="text" placeholder="Nhập tên" v-model="name" @keypress="show_error=false">
+            <input class="form-control mt-3" :class="show_error ? 'input-error' : ''" type="text" placeholder="Nhập tên"
+                v-model="name" @keypress="show_error=false">
             <p class="fs-7 ms-1 text-danger" v-if="show_error">{{ show_error }}</p>
             <div class="d-flex gap-2 justify-content-end mt-3">
                 <button class="btn btn-primary" @click="addFolder">Xác nhận</button>

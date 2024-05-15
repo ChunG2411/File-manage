@@ -1,10 +1,10 @@
 <script setup>
 import axios from 'axios'
 import { ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 
 import Store from '../utils/store.js'
-import { formatSize } from '../utils/functions.js'
+import { formatSize, checkError } from '../utils/functions.js'
 
 
 const store = Store()
@@ -22,11 +22,7 @@ async function getLimit() {
             store.loading = false
         })
         .catch(_ => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: 'Vui lòng tải lại trang'
-            }
+            checkError(error)
         })
 }
 
@@ -77,11 +73,7 @@ function sendRequest() {
             showComp.value = ''
         })
         .catch(error => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: error.response.data
-            }
+            checkError(error)
         })
 }
 

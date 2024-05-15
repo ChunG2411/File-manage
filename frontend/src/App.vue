@@ -23,10 +23,6 @@ watch(() => store.toast, (currentvalue, _) => {
   }
 })
 
-// watch(() => store.lang, (currentvalue, _) => {
-//   console.log(store.lang)
-// })
-
 
 if (localStorage.getItem('theme')) {
   document.documentElement.className = localStorage.getItem('theme')

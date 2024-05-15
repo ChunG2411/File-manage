@@ -15,7 +15,7 @@ import FilePreveiw from './filePreveiw.vue'
 import Add from './rightclick_comp/add.vue'
 import Preveiw from './preview/preveiw.vue'
 
-import {differentDate} from '../utils/functions.js'
+import { differentDate, checkError } from '../utils/functions.js'
 
 
 const store = Store()
@@ -134,12 +134,8 @@ async function getData(path) {
             store.loading = false
             store.reload = false
         })
-        .catch(_ => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: 'Vui lòng tải lại trang'
-            }
+        .catch(error => {
+            checkError(error)
         })
 }
 getData(route.path)
@@ -209,12 +205,8 @@ function DeleteFunc() {
             store.loading = false
             store.reload = true
         })
-        .catch(_ => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: 'Vui lòng tải lại trang'
-            }
+        .catch(error => {
+            checkError(error)
         })
 }
 
@@ -230,11 +222,7 @@ function saveFunc() {
             store.loading = false
         })
         .catch(error => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: error.response.data
-            }
+            checkError(error)
         })
 }
 
@@ -258,10 +246,7 @@ function downloadFile() {
             }
         })
         .catch(error => {
-            store.toast = {
-                title: 'error',
-                content: 'Vui lòng thử lại'
-            }
+            checkError(error)
         })
 }
 

@@ -146,7 +146,7 @@ class MyProfileView(APIView):
         if email:
             try:
                 User.objects.get(email=email)
-                return Response("Email already exist")
+                return Response("Email already exist", status=400)
             except:
                 user = profile.user
                 user.email = email
@@ -159,8 +159,6 @@ class MyProfileView(APIView):
                 return Response("Enter different password", status=400)
             user.set_password(password)
             user.save()
-        else:
-            return Response("Enter password", status=400)
         
         profile.save()
         serializer = ProfileSerializers(profile)
@@ -190,7 +188,7 @@ class ProfileView(APIView):
     def delete(self, request, username):
         my_profile = Profile.objects.get(user=request.user)
         if my_profile.type != '0':
-            return Response("You don't have permission", status=400)
+            return Response("You don't have permission", status=402)
 
         user = User.objects.get(username=username)
         user.delete()
@@ -203,7 +201,7 @@ class RequestView(APIView):
     def get(self, request):
         my_profile = Profile.objects.get(user=request.user)
         if my_profile.type != '0':
-            return Response("You don't have permission", status=400)
+            return Response("You don't have permission", status=402)
         
         requests = RequestUpgrate.objects.all()
         pagination = PageNumberPagination()
@@ -217,7 +215,7 @@ class RequestView(APIView):
         my_profile = Profile.objects.get(user=request.user)
 
         if my_profile.type != '0':
-            return Response("You don't have permission", status=400)
+            return Response("You don't have permission", status=402)
 
         if r.status == '0':
             r.status = '1'
@@ -234,7 +232,7 @@ class RequestView(APIView):
         my_profile = Profile.objects.get(user=request.user)
 
         if my_profile.type != '0':
-            return Response("You don't have permission", status=400)
+            return Response("You don't have permission", status=402)
 
         if r.status == '0':
             r.status = '2'

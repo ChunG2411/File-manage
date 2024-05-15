@@ -21,7 +21,7 @@ class FolderView(APIView):
             serializer = FolderSerializers(folder)
             return Response(serializer.data, status=200)
         else:
-            return Response("You don't have permission", status=400)
+            return Response("You don't have permission", status=402)
 
     def post(self, request):
         parent_id = request.data.get('parent')
@@ -32,7 +32,7 @@ class FolderView(APIView):
         if parent_id:
             parent = Folder.objects.get(id=parent_id)
             if parent.created_by != request.user:
-                return Response("You don't have permission", status=400)
+                return Response("You don't have permission", status=402)
             folder = Folder.objects.create(
                 name=name, parent=parent, created_by=request.user)
         else:
@@ -48,7 +48,7 @@ class FolderView(APIView):
         folder = Folder.objects.get(id=id)
 
         if folder.created_by != request.user:
-            return Response("You don't have permission", status=400)
+            return Response("You don't have permission", status=402)
 
         if folder.deleted:
             folder.delete()
@@ -65,7 +65,7 @@ class FolderView(APIView):
         folder = Folder.objects.get(id=id)
 
         if folder.created_by != request.user:
-            return Response("You don't have permission", status=400)
+            return Response("You don't have permission", status=402)
 
         folder.deleted = False
         folder.save()
@@ -89,7 +89,7 @@ class FolderDetailView(APIView):
 
         folder = Folder.objects.get(id=id)
         if folder.created_by != request.user:
-            return Response("You don't have permission", status=400)
+            return Response("You don't have permission", status=402)
         if name:
             if check_validate(name):
                 return Response("Name not valid", status=400)
@@ -137,7 +137,7 @@ class FileView(APIView):
         if parent:
             folder = Folder.objects.get(id=parent)
             if folder.created_by != request.user:
-                return Response("You don't have permission", status=400)
+                return Response("You don't have permission", status=402)
         else:
             folder = None
 
@@ -162,7 +162,7 @@ class FileView(APIView):
         file = File.objects.get(id=id)
 
         if file.created_by != request.user:
-            return Response("You don't have permission", status=400)
+            return Response("You don't have permission", status=402)
 
         if file.deleted:
             file.delete()
@@ -182,7 +182,7 @@ class FileView(APIView):
         file = File.objects.get(id=id)
 
         if file.created_by != request.user:
-            return Response("You don't have permission", status=400)
+            return Response("You don't have permission", status=402)
 
         file.deleted = False
         file.save()
@@ -206,7 +206,7 @@ class FileDetailView(APIView):
 
         file = File.objects.get(id=id)
         if file.created_by != request.user:
-            return Response("You don't have permission", status=400)
+            return Response("You don't have permission", status=402)
         if name:
             if check_validate(name):
                 return Response("Name not valid", status=400)
@@ -258,7 +258,7 @@ def downloadFile(request, id):
         limit.save()
         return response
     else:
-        return Response("You don't have permission", status=400)
+        return Response("You don't have permission", status=402)
 
 
 @permission_classes([permissions.IsAuthenticated])
@@ -306,7 +306,7 @@ class HomeView(APIView):
 class SearchView(APIView):
     def get(self, request):
         search = request.query_params.get('search')
-        folder = Folder.objects.filter(name__contains = search.lower())
+        folder = Folder.objects.filter(name__contains = search.lower(), created_by=request.user)
 
         return Response({
             'folder': [{

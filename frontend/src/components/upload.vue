@@ -3,6 +3,7 @@ import axios from 'axios'
 import { ref, watch } from 'vue'
 
 import Store from '../utils/store.js'
+import { checkError } from '../utils/functions.js'
 
 
 const store = Store()
@@ -52,10 +53,7 @@ function upload(data) {
             setTimeout(() => {
                 process.value = process.value.filter((item)=>item.id != data.id)
             }, 2000)
-            store.toast = {
-                title: 'error',
-                content: error.response.data
-            }
+            checkError(error)
         })
 }
 

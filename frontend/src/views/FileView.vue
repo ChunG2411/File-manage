@@ -5,6 +5,7 @@ import Preveiw from '../components/preview/preveiw.vue'
 
 import { useRoute, useRouter } from 'vue-router'
 import Store from '../utils/store.js'
+import { checkError } from '../utils/functions.js'
 
 
 const store = Store()
@@ -38,12 +39,8 @@ function getProfile() {
             store.profile = response.data
             store.loading = false
         })
-        .catch(_ => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: 'Vui lòng tải lại trang'
-            }
+        .catch(error => {
+            checkError(error)
         })
 }
 getProfile()
@@ -62,11 +59,7 @@ function saveFunc() {
             store.loading = false
         })
         .catch(error => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: error.response.data
-            }
+            checkError(error)
         })
 }
 
@@ -90,10 +83,7 @@ function downloadFile() {
             }
         })
         .catch(error => {
-            store.toast = {
-                title: 'error',
-                content: 'Vui lòng thử lại'
-            }
+            checkError(error)
         })
 }
 </script>

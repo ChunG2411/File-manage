@@ -4,6 +4,7 @@ const Store = defineStore('store', {
     state: () => ({
         api: "http://127.0.0.1:8000",
         is_login: (localStorage.getItem('token') === null) ? false : true,
+        pre_router : null,
         header: {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`

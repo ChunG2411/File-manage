@@ -1,13 +1,12 @@
 <script setup>
 import { ref, watch, defineProps } from 'vue'
 import axios from 'axios'
-import { useRoute } from 'vue-router'
 
 import Store from '../../utils/store.js'
+import { checkError } from '../../utils/functions.js'
 
 
 const store = Store()
-const route = useRoute()
 
 const props = defineProps({
     type: String,
@@ -31,12 +30,8 @@ function getDetail() {
             new_data.value = data.value
             store.loading = false
         })
-        .catch(_ => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: 'Vui lòng tải lại trang'
-            }
+        .catch(error => {
+            checkError(error)
         })
 }
 
@@ -57,12 +52,8 @@ function submit() {
             }
             store.reload = true
         })
-        .catch(_ => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: 'Vui lòng tải lại trang'
-            }
+        .catch(error => {
+            checkError(error)
         })
 }
 

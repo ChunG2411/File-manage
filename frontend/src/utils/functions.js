@@ -2,6 +2,8 @@ import vi from '../assets/lang/vi.json' assert {type: 'json'}
 import en from '../assets/lang/en.json' assert {type: 'json'}
 import zh from '../assets/lang/zh.json' assert {type: 'json'}
 
+import Store from './store'
+
 
 export function formatDate(datetime) {
     const date = datetime.split('T')[0]
@@ -38,5 +40,38 @@ export function getText(lang, file, pos) {
     }
     else {
         return vi[file][pos]
+    }
+}
+
+export function checkError(error) {
+    const store = Store()
+
+    if (error.response.status == 400) {
+        store.loading = false
+        store.toast = {
+            title: 'error',
+            content: error.response.data
+        }
+    }
+    else if (error.response.status == 402) {
+        store.loading = false
+        store.toast = {
+            title: 'error',
+            content: 'Bạn không có quyền thực hiện'
+        }
+    }
+    else if (error.response.status == 401) {
+        store.loading = false
+        store.toast = {
+            title: 'error',
+            content: 'Vui lòng đăng nhập lại hệ thống'
+        }
+    }
+    else {
+        store.loading = false
+        store.toast = {
+            title: 'error',
+            content: 'Vui lòng tải lại trang'
+        }
     }
 }

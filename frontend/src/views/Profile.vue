@@ -1,7 +1,7 @@
 <script setup>
 import Header from '../components/header.vue'
 import Store from '../utils/store.js'
-import { formatDate, formatSize } from '../utils/functions.js'
+import { formatDate, formatSize, checkError } from '../utils/functions.js'
 
 import { reactive, ref } from 'vue'
 import axios from 'axios'
@@ -41,12 +41,8 @@ async function getProfile() {
             
             store.loading = false
         })
-        .catch(_ => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: 'Vui lòng tải lại trang'
-            }
+        .catch(error => {
+            checkError(error)
         })
 }
 getProfile()
@@ -59,12 +55,8 @@ async function getLimit() {
             store.limit = response.data
             store.loading = false
         })
-        .catch(_ => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: 'Vui lòng tải lại trang'
-            }
+        .catch(error => {
+            checkError(error)
         })
 }
 
@@ -151,12 +143,8 @@ function submitInfor() {
             
             store.loading = false
         })
-        .catch(_ => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: 'Vui lòng tải lại trang'
-            }
+        .catch(error => {
+            checkError(error)
         })
 }
 
@@ -186,11 +174,7 @@ function submitPass() {
             }
         })
         .catch(error => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: error.response.data
-            }
+            checkError(error)
         })
 }
 
@@ -225,11 +209,7 @@ function upgrade() {
             }
         })
         .catch(error => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: error.response.data
-            }
+            checkError(error)
         })
 }
 
@@ -242,11 +222,7 @@ function getRequest() {
             request.value = response.data
         })
         .catch(error => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: 'Vui lòng tải lại trang'
-            }
+            checkError(error)
         })
 }
 
@@ -263,11 +239,7 @@ function accept(id) {
             getRequest()
         })
         .catch(error => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: 'Vui lòng tải lại trang'
-            }
+            checkError(error)
         })
 }
 
@@ -284,11 +256,7 @@ function reject(id) {
             getRequest()
         })
         .catch(error => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: 'Vui lòng tải lại trang'
-            }
+            checkError(error)
         })
 }
 

@@ -4,6 +4,7 @@ import axios from 'axios'
 import { useRouter } from 'vue-router'
 
 import Store from '../utils/store.js'
+import { checkError } from '../utils/functions.js'
 
 
 const store = Store()
@@ -17,7 +18,8 @@ const form_signup = reactive({
     email: '',
     pass: '',
     repass: '',
-    captcha: ''
+    captcha: '',
+    code: ''
 })
 const form_signin = reactive({
     email: '',
@@ -26,7 +28,8 @@ const form_signin = reactive({
 const error = reactive({
     email: '',
     pass: '',
-    captcha: ''
+    captcha: '',
+    code: ''
 })
 
 
@@ -43,7 +46,12 @@ function checkValidate() {
     error.email = ''
     error.pass = ''
     error.captcha = ''
+    error.code = ''
 
+    if (!form_signup.code) {
+        error.code = "Nhập mã xác thực email"
+        status = false
+    }
     if (form_signup.pass != form_signup.repass) {
         error.pass = "Mật khẩu không khớp"
         status = false
@@ -61,6 +69,37 @@ function checkValidate() {
         })
 
     return status
+}
+
+async function sendCode() {
+    let status = true
+
+    if (form_signup.email == '') {
+        error.email = "Nhập email"
+        return
+    }
+
+    await axios.get(`${store.api}/api/email?email=${form_signup.email}`)
+        .catch(e => {
+            error.email = e.response.data
+            status = false
+        })
+    
+    if (status) {
+        const form = new FormData()
+        form.append('email', form_signup.email)
+
+        axios.post(`${store.api}/api/get-code`, form)
+            .then(response => {
+                store.toast = {
+                    title: 'success',
+                    content: 'Mã xác thực được gửi đến email của bạn'
+                }
+            })
+            .catch(error => {
+                checkError(error)
+            })        
+    }
 }
 
 function Signin() {
@@ -81,14 +120,16 @@ function Signin() {
                 title: 'success',
                 content: 'Đăng nhập thành công'
             }
-            router.push({ path: '/' })
-        })
-        .catch(e => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: e.response.data
+            
+            if (store.pre_router) {
+                router.push({ path: store.pre_router })
             }
+            else {
+                router.push({ path: '/' })
+            }
+        })
+        .catch(error => {
+            checkError(error)
         })
 }
 
@@ -106,6 +147,7 @@ function Signup() {
         form.append('email', form_signup.email + '@gmail.com')
         form.append('username', form_signup.email)
         form.append('password', form_signup.pass)
+        form.append('code', form_signup.code)
 
         axios.post(`${store.api}/api/register`, form)
             .then(_ => {
@@ -116,12 +158,8 @@ function Signup() {
                 }
                 tab.value = true
             })
-            .catch(_ => {
-                store.loading = false
-                store.toast = {
-                    title: 'error',
-                    content: 'Đăng ký tài khoản thất bại. Vui lòng thử lại sau'
-                }
+            .catch(error => {
+                checkError(error)
             })
     }
 }
@@ -166,23 +204,30 @@ function Signup() {
                 <h3>Tạo tài khoản</h3>
                 <div class="d-flex flex-column mt-3 mb-3">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Email" v-model="form_signup.email"
-                            required>
+                        <input type="text" class="form-control" :class="error.email ? 'input-error' : ''" placeholder="Email"
+                            v-model="form_signup.email" @keyup="error.email=''" required>
                         <div class="input-group-append">
                             <span class="input-group-text">@gmail.com</span>
                         </div>
                     </div>
                     <p class="fs-7 text-danger ms-2" v-if="error.email">{{ error.email }}</p>
 
-                    <input type="text" class="form-control mt-2" placeholder="Mật khẩu" v-model="form_signup.pass"
-                        required>
-                    <input type="text" class="form-control mt-2" placeholder="Nhập lại mật khẩu"
-                        v-model="form_signup.repass" required>
+                    <div class="d-flex gap-2 align-items-center mt-2">
+                        <input type="text" class="form-control" placeholder="Mã xác thực email"
+                            v-model="form_signup.code" required>
+                        <button type="button" @click="sendCode">Gửi mã</button>
+                    </div>
+                    <p class="fs-7 text-danger ms-2" v-if="error.code">{{ error.code }}</p>
+
+                    <input type="text" class="form-control mt-2" :class="error.pass ? 'input-error' : ''" placeholder="Mật khẩu"
+                        v-model="form_signup.pass" @keyup="error.pass=''" required>
+                    <input type="text" class="form-control mt-2" :class="error.pass ? 'input-error' : ''" placeholder="Nhập lại mật khẩu"
+                        v-model="form_signup.repass" @keyup="error.pass=''" required>
                     <p class="fs-7 text-danger ms-2" v-if="error.pass">{{ error.pass }}</p>
 
                     <div class="d-flex gap-2 align-items-center mt-2">
-                        <input type="text" class="form-control" placeholder="Mã xác nhận" v-model="form_signup.captcha"
-                            required>
+                        <input type="text" class="form-control" :class="error.captcha ? 'input-error' : ''" placeholder="Mã Captcha"
+                            v-model="form_signup.captcha" @keyup="error.captcha=''" required>
                         <div class="position-relative d-flex align-items-center">
                             <input type="text" class="form-control" :value="captcha.join('')" disabled readonly>
                             <div class="icon rec-30 position-absolute" style="right: 3px" @click="get_captcha">

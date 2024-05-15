@@ -4,7 +4,7 @@ import axios from 'axios'
 import { vOnClickOutside } from '@vueuse/components'
 import { useRouter } from 'vue-router'
 
-import { getText } from '../utils/functions.js'
+import { getText, checkError } from '../utils/functions.js'
 import Store from '../utils/store.js'
 
 
@@ -25,12 +25,8 @@ function getProfile() {
             store.profile = response.data
             store.loading = false
         })
-        .catch(_ => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: 'Vui lòng tải lại trang'
-            }
+        .catch(error => {
+            checkError(error)
         })
 }
 getProfile()
@@ -49,11 +45,7 @@ function search() {
             store.loading = false
         })
         .catch(_ => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: 'Vui lòng tải lại trang'
-            }
+            checkError(error)
         })
 }
 
@@ -81,11 +73,7 @@ function Logout(params) {
             router.push({ path: '/login' })
         })
         .catch(_ => {
-            store.loading = false
-            store.toast = {
-                title: 'error',
-                content: 'Vui lòng tải lại trang'
-            }
+            checkError(error)
         })
 }
 
