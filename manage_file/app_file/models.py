@@ -13,7 +13,7 @@ def file_upload_to(instance, filename):
     if instance.parent:
         path += '/' + str(instance.parent.id)
 
-    upload_path = os.path.join(path, instance.name + extension)
+    upload_path = os.path.join(path, instance.name.rsplit('.', 1)[0] + extension)
     return upload_path
 
 

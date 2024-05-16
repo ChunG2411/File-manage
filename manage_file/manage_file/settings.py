@@ -72,6 +72,9 @@ ROOT_URLCONF = 'manage_file.urls'
 CORS_ALLOW_ALL_ORIGINS = True
 
 
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

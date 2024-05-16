@@ -183,7 +183,6 @@ function showComponentAdd(type) {
         showComp.id = ''
     }   
     showComp.type = type
-    console.log(showComp);
 }
 
 function showPreveiwFunc(data) {

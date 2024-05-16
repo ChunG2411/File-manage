@@ -10,6 +10,7 @@ const props = defineProps({
     showClose: Boolean
 })
 const file_format = ref('')
+const file = ref(null)
 
 
 watch(() => props.data, (newValue, _) => {
@@ -79,6 +80,9 @@ checkFormat(props.data.file)
             </div>
             <div class="preveiw-slot" v-else-if="file_format == 'video'">
                 <video :src="store.api + props.data.file" controls autoplay></video>
+            </div>
+            <div class="preveiw-slot" v-else-if="file_format == 'pdf'">
+                <object :data="store.api + props.data.file" width="800" height="500"></object>
             </div>
             <div v-else>
                 <p>Không thể xem trước tệp tin này</p>
