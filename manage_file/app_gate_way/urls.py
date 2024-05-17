@@ -1,11 +1,10 @@
 from django.urls import path
 
 from app_user.views import (
-    RegisterUser, LoginView, LogoutView, GetCode,
+    RegisterUser, TokenView, LogoutView, GetCode,
     MyProfileView, ProfileView, RequestView,
     LimitView,
-    EmailView,
-    blacklist_res
+    EmailView
 )
 from app_file.views import(
     HomeView, SearchView,
@@ -16,9 +15,8 @@ from app_file.views import(
 
 urlpatterns = [
     path('register', RegisterUser.as_view(), name="RegisterUser"),
-    path('login', LoginView.as_view(), name="LoginView"),
+    path('login', TokenView.as_view(), name="TokenView"),
     path('logout', LogoutView.as_view(), name="LogoutView"),
-    path('token-blacklist', blacklist_res, name="blacklist_res"),
 
     path('get-code', GetCode.as_view(), name="GetCode"),
     path('my-profile', MyProfileView.as_view(), name="MyProfileView"),

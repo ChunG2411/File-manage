@@ -2,27 +2,25 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.pagination import PageNumberPagination
 
-# from django.core.mail import send_mail
-from django.utils import timezone
-# from django.conf import settings
+from oauth2_provider.views.mixins import OAuthLibMixin
+from oauth2_provider.models import AccessToken, RefreshToken
+
+from django.views import View
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.http import HttpResponse
+
 from random import randint, choice
 
 from .models import User, Profile, LimitAction, RequestUpgrate, EmailCode
 from .serializers import UserRegisterSerializers, ProfileSerializers, LimitActionSerializers, RequestUpgrateSerializers, EmailCodeSerializers
-from manage_file.function import check_validate, check_token_blacklisted
+from manage_file.function import check_validate
 from .task import send_email_task
+from manage_file.config import OAUTH2_INFO
 
 # Create your views here.
-
-
-@api_view(['GET'])
-def blacklist_res(request):
-    return Response("Unauthorized", status=401)
 
 
 class GetCode(APIView):
@@ -67,59 +65,51 @@ class RegisterUser(APIView):
         return Response(serializer.errors, status=400)
 
 
-class LoginView(APIView):
-    def post(self, request):
-        username_email = request.data.get('username_email')
-        password = request.data.get('password')
+@method_decorator(csrf_exempt, name="dispatch")
+class TokenView(OAuthLibMixin, View):
+    def post(self, request, *args, **kwargs):
+        username_email = request.POST.get('username_email')
+        password = request.POST.get('password')
 
         user = None
         try:
-            user = User.objects.get(username=username_email)
-            username = username_email
+            username = username_email.split('@')[0] if '@' in username_email else username_email
+            user = User.objects.get(username=username)
+            if not user.check_password(password):
+                return HttpResponse("Password incorect", status=400)
         except:
-            try:
-                user = User.objects.get(email=username_email)
-                username = user.username
-            except:
-                return Response("Username or Email don't exist", status=400)
+            return HttpResponse("Username or Email don't exist", status=400)
 
-        if not user.check_password(password):
-            return Response("Password incorect", status=400)
+        post = request.POST.copy()
+        post['username'] = username
+        post['client_id'] = OAUTH2_INFO['client_id']
+        post['client_secret'] = OAUTH2_INFO['client_secret']
+        post['grant_type'] = 'password'
+        request.POST = post
 
-        refresh = TokenObtainPairSerializer.get_token(user)
-        user.last_login = timezone.now()
-        user.save()
-        response = {
-            'username': user.username,
-            'access': str(refresh.access_token),
-            'refresh': str(refresh)
-        }
-        return Response(response, status=200)
-
+        _, _, body, status = self.create_token_response(request)
+        return HttpResponse(content=body, status=status)
+        
 
 @permission_classes([permissions.IsAuthenticated])
-@check_token_blacklisted
 class LogoutView(APIView):
-    def post(self, request):    
-        if request.data.get('all'):
-            token: OutstandingToken
-            for token in OutstandingToken.objects.filter(user=request.user):
-                _, _ = BlacklistedToken.objects.get_or_create(token=token)
-            return Response("Logout all successful", status=200)
-        # refresh_token = request.data.get('refresh_token')
-        # try:
-        #     token = RefreshToken(token=refresh_token)
-        #     token.blacklist()
-        # except:
-        #     return Response("Token is blacklisted", status=400)
-        token: OutstandingToken
-        for token in OutstandingToken.objects.filter(user=request.user):
-            _, _ = BlacklistedToken.objects.get_or_create(token=token)
-        return Response("Logout successful", status=200)
+    def post(self, request):
+        all = request.data.get('all')
+        if all:
+            access_token = AccessToken.objects.filter(user=request.user)
+            refresh_token = RefreshToken.objects.filter(user=request.user)
+            access_token.delete()
+            refresh_token.delete()
+            return Response("Logout all successfull", status=200)
+        else:
+            access_token = AccessToken.objects.get(token=request.auth)
+            refresh_token = RefreshToken.objects.get(access_token=access_token)
+            access_token.delete()
+            refresh_token.delete()
+            return Response("Logout successfull", status=200)
 
 
 @permission_classes([permissions.IsAuthenticated])
-@check_token_blacklisted
 class MyProfileView(APIView):
     def get(self, request):
         try:
@@ -177,7 +167,6 @@ class MyProfileView(APIView):
 
 
 @permission_classes([permissions.IsAuthenticated])
-@check_token_blacklisted
 class ProfileView(APIView):
     def get(self, request, username):
         user = User.objects.get(username=username)
@@ -196,7 +185,6 @@ class ProfileView(APIView):
 
 
 @permission_classes([permissions.IsAuthenticated])
-@check_token_blacklisted
 class RequestView(APIView):
     def get(self, request):
         my_profile = Profile.objects.get(user=request.user)
@@ -242,7 +230,6 @@ class RequestView(APIView):
 
 
 @permission_classes([permissions.IsAuthenticated])
-@check_token_blacklisted
 class LimitView(APIView):
     def get(self, request):
         limit = LimitAction.objects.get(user=request.user)

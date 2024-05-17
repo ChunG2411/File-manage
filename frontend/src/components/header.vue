@@ -44,7 +44,7 @@ function search() {
             card.value = 'search'
             store.loading = false
         })
-        .catch(_ => {
+        .catch(error => {
             checkError(error)
         })
 }
@@ -55,9 +55,6 @@ function Logout(params) {
     const form = new FormData()
     if (params == 'all') {
         form.append('all', 'true')
-    }
-    else{
-        form.append('refresh_token', localStorage.getItem('refresh'))
     }
 
     axios.post(`${store.api}/api/logout`, form, store.header)
@@ -72,7 +69,7 @@ function Logout(params) {
             }
             router.push({ path: '/login' })
         })
-        .catch(_ => {
+        .catch(error => {
             checkError(error)
         })
 }

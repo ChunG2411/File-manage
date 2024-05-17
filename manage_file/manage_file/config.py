@@ -18,3 +18,8 @@ status_request = [
     ('1','accepted'),
     ('2','rejected')
 ]
+
+OAUTH2_INFO = {
+    'client_id': 'uwDef00tNEsm3y62YfNMsdaTIa9YiBkFbNjLAV0W',
+    'client_secret': 'hXz20oFUOMHsMshpRkfpCvMxiYsjw8RZNjxpG9RpyFnLLHbtHas4z28Vn6T7N0eYX3Q75Aa12IHAATXRaIbYftkmZLzdX2Uqd1he7RnrLb6wUT8AVOdVNAa61cATRKbn'
+}

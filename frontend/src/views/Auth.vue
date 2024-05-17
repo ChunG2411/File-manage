@@ -111,8 +111,8 @@ function Signin() {
 
     axios.post(`${store.api}/api/login`, form)
         .then(response => {
-            localStorage.setItem('token', response.data.access)
-            store.header.headers.Authorization = `Bearer ${response.data.access}`
+            localStorage.setItem('token', response.data.access_token)
+            store.header.headers.Authorization = `Bearer ${response.data.access_token}`
             store.is_login = true
 
             store.loading = false
@@ -168,8 +168,8 @@ function Signup() {
 
 <template>
     <div class="auth">
-        <div class="d-flex">
-            <div class="w-60 d-flex flex-column justify-content-center">
+        <div class="auth-card">
+            <div>
                 <h1>Chào mừng đến với</h1>
                 <div class="d-flex gap-3 align-items-center mt-3 ms-3">
                     <div class="logo rec-100">
@@ -180,7 +180,7 @@ function Signup() {
             </div>
 
             <!-- -----------------signin----------------------- -->
-            <form class="w-40 text-center" @submit.prevent="Signin" v-if="tab">
+            <form class="text-center" @submit.prevent="Signin" v-if="tab">
                 <h3>Đăng nhập</h3>
                 <div class="d-flex flex-column gap-2 mt-3 mb-3">
                     <input type="text" class="form-control" placeholder="Tên tài khoản hoặc Email"
@@ -200,7 +200,7 @@ function Signup() {
             </form>
 
             <!-- -----------------signup----------------------- -->
-            <form class="w-40 text-center" @submit.prevent="Signup" v-else>
+            <form class="text-center" @submit.prevent="Signup" v-else>
                 <h3>Tạo tài khoản</h3>
                 <div class="d-flex flex-column mt-3 mb-3">
                     <div class="input-group">
@@ -258,7 +258,33 @@ function Signup() {
     padding: 40px 30px;
     border-radius: 10px;
     width: max-content;
-    min-width: 700px;
-    border: 1px solid var(--card_border_color)
+    min-width: 300px;
+    max-width: 900px;
+    border: 1px solid var(--card_border_color);
+}
+
+.auth-card {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+}
+
+
+@media screen and (max-width: 700px) {
+    .auth {
+        width: 100%;
+        max-width: 100%;
+    }
+    .auth-card {
+        flex-direction: column;
+        gap: 30px;
+    }
+}
+
+@media screen and (max-width: 550px) {
+    .logo {
+        width: 70px !important;
+        min-width: 70px !important;
+    }
 }
 </style>

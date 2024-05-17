@@ -21,7 +21,7 @@ async function getLimit() {
             store.limit = response.data
             store.loading = false
         })
-        .catch(_ => {
+        .catch(error => {
             checkError(error)
         })
 }
