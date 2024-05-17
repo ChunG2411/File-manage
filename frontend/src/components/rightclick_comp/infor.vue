@@ -3,7 +3,7 @@ import { ref, watch, defineProps } from 'vue'
 import axios from 'axios'
 
 import Store from '../../utils/store.js'
-import { formatDate, checkError } from '../../utils/functions.js'
+import { formatDate, checkError, formatSize } from '../../utils/functions.js'
 
 
 const store = Store()
@@ -86,7 +86,7 @@ function unsave() {
         </div>
         <div class="d-flex gap-2 mt-2">
             <b>Kích thước: </b>
-            <p>{{ data.size ? (data.size / 1024).toFixed(2) : '0' }} Mb</p>
+            <p>{{ data.size ? formatSize(data.size) : '' }}</p>
         </div>
         <div class="d-flex gap-2 mt-2">
             <b>Người sở hữu: </b>
@@ -120,5 +120,13 @@ function unsave() {
     max-width: 350px;
     overflow-y: scroll;
     overflow-x: hidden;
+}
+
+@media screen and (max-width: 1000px) {
+    .custom-card {
+        position: absolute;
+        right: 5px;
+        max-height: calc(100% - 70px);
+    }
 }
 </style>

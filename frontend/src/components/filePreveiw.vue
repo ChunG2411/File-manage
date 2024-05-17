@@ -71,7 +71,15 @@ checkFormat(props.src)
 }
 
 .file-preview img{
-    height: 100% !important;
-    width: max-content !important;
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+}
+
+@media screen and (max-width: 550px) {
+    .file-preview {
+        width: 100px;
+        height: 70px;
+    }
 }
 </style>

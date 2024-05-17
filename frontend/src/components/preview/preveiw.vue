@@ -103,7 +103,6 @@ checkFormat(props.data.file)
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 10px;
 }
 
 .preveiw-header {
@@ -144,5 +143,11 @@ h6, p {
 
 .profile-img:hover {
     border: 1px solid var(--hover_color);
+}
+
+@media screen and (max-width: 800px) {
+    .preveiw-slot {
+        width: 100%;
+    }
 }
 </style>

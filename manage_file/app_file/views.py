@@ -141,7 +141,7 @@ class FileView(APIView):
         else:
             folder = None
 
-        size = file_upload.size // 1024
+        size = file_upload.size // 1024 if file_upload.size % 1024 == 0 else file_upload.size // 1024 + 1
         profile = Profile.objects.get(user=request.user)
         limit = LimitAction.objects.get(user=request.user)
 
@@ -317,3 +317,4 @@ class SearchView(APIView):
                     'update_at': i.updated_at
                     } for i in folder]
         }, status=200)
+            

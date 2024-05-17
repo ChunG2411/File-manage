@@ -514,4 +514,13 @@ function getPage(url) {
     z-index: 1;
 }
 
+
+@media screen and (max-width: 550px) {
+    .main-content {
+        max-width: 100vw;
+    }
+    .profile {
+        width: 100%;
+    }
+}
 </style>

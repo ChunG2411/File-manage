@@ -421,7 +421,7 @@ function changeFilterTime(time, label) {
                             <path d="M13 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V9l-7-7z" />
                             <path d="M13 3v6h6" />
                         </svg>
-                        <p>{{ (i.name.length > 10) ? i.name.slice(0, 10) + '...' : i.name }}</p>
+                        <p>{{ (i.name.length > 10) ? i.name.slice(0, 7) + '...' : i.name }}</p>
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                             stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round"
                             @click="showMenu($event, 'file', i)">
@@ -580,6 +580,7 @@ function changeFilterTime(time, label) {
     padding: 10px;
     margin-top: 50px;
     width: 100%;
+    height: calc(100% - 50px);
     border: 1px solid var(--card_border_color);
 }
 
@@ -635,7 +636,6 @@ function changeFilterTime(time, label) {
 
 .item-right {
     padding: 5px 15px;
-    min-width: 170px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -677,5 +677,17 @@ function changeFilterTime(time, label) {
 .infor-enter-from,
 .infor-leave-to {
   margin-right: -350px;
+}
+
+
+@media screen and (max-width: 550px) {
+    .item {
+        min-width: 140px;
+        max-width: 140px;
+    }
+    .card {
+        height: calc(100% - 100px);
+        max-height: calc(100% - 100px);
+    }
 }
 </style>

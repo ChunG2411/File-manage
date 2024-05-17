@@ -64,7 +64,7 @@ body {
 #app {
   width: 100vw;
   height: 100vh;
-  min-width: 1000px;
+  min-width: 600px;
   min-height: 600px;
   overflow: hidden;
   background-color: var(--background_color);
@@ -112,6 +112,9 @@ p, b {
   color: var(--text_color);
   font-size: 1rem;
   width: max-content;
+}
+th, td {
+  font-size: 1rem;
 }
 
 a {
@@ -301,7 +304,7 @@ button:hover {
 
 .btn-drop-item {
   padding: 5px 15px;
-  min-width: 170px;
+  min-width: 100px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -309,4 +312,42 @@ button:hover {
 
 .btn-drop-item:hover {
   background-color: var(--hover_color);
+}
+
+/* ----------------------------responsive------------------------------- */
+@media screen and (max-width: 550px) {
+  #app {
+    min-width: 100vw;
+  }
+
+  p, b {
+    font-size: 0.8rem;
+  }
+
+  th, td {
+    font-size: 0.8rem;
+  }
+  
+  h5 {
+    font-size: 1.05rem;
+  }
+  
+  .fs-7 {
+    font-size: 0.6rem !important
+  }
+  
+  .v-toast__text {
+    font-size: 0.8rem;
+  }
+
+  button {
+    font-size: 0.8rem!important;
+  }
+
+  input, select, .input-group-text {
+    font-size: 0.8rem !important;
+  }
+  .input-group, input {
+    max-width: 250px;
+  }
 }

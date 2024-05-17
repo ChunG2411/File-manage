@@ -106,7 +106,7 @@ function setLang(lang) {
 
 <template>
     <div class="header">
-        <router-link to="/home" class="d-flex gap-2 align-items-center pointer">
+        <router-link to="/home" class="header-logo">
             <div class="logo rec-40">
                 <img src="../assets/image/logo.png">
             </div>
@@ -114,7 +114,7 @@ function setLang(lang) {
         </router-link>
         <div class="search">
             <div class="icon rec-30 position-absolute" style="left: 10px;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                     stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round">
                     <circle cx="11" cy="11" r="8"></circle>
                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -122,7 +122,7 @@ function setLang(lang) {
             </div>
             <input class="search-input" type="text" placeholder="Tìm trong Drive" v-model="input" @keyup="search">
             <div class="icon rec-30 position-absolute" style="right: 10px;" @click="input = '';search_data=null">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                     stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -142,18 +142,9 @@ function setLang(lang) {
             </div>
         </div>
         <div class="d-flex gap-2 align-items-center position-relative">
-            <div class="icon rec-30">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-            </div>
-
             <div class="position-relative">
                 <div class="icon rec-30" @click="card='setting'">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                         stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="3"></circle>
                         <path
@@ -237,12 +228,19 @@ function setLang(lang) {
     top: 0;
     left: 0;
     width: 100%;
-    padding: 10px 20px 10px 30px;
+    padding: 10px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     max-height: 60px;
     z-index: 50;
+}
+
+.header-logo {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    gap: 10px;
 }
 
 .search {
@@ -290,17 +288,17 @@ function setLang(lang) {
     height: max-content;
     display: flex;
     flex-direction: column;
-    /* gap: 5px; */
     right: 0;
 }
 
 .header-card-item {
-    padding: 5px 15px;
-    min-width: 150px;
+    padding: 5px 10px;
     display: flex;
+    gap: 10px;
     align-items: center;
     justify-content: space-between;
     position: relative;
+    min-width: 100px;
 }
 
 .header-card-item:hover {
@@ -322,8 +320,16 @@ function setLang(lang) {
     width: max-content;
     height: max-content;
     flex-direction: column;
-    /* gap: 5px; */
     right: 100%;
     top: 0;
+}
+
+@media screen and (max-width: 550px) {
+    .header-logo {
+        display: none;
+    }
+    .search {
+        width: 70%;
+    }
 }
 </style>

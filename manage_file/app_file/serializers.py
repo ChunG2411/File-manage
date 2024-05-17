@@ -22,7 +22,8 @@ class FolderSerializers(serializers.ModelSerializer):
                 'id': str(i.id),
                 'name': i.name,
                 'permissions': i.permissions,
-                'delete': i.deleted
+                'delete': i.deleted,
+                'update_at': i.updated_at
             } for i in folder
         ]
     
@@ -34,7 +35,8 @@ class FolderSerializers(serializers.ModelSerializer):
                 'name': i.name,
                 'permissions': i.permissions,
                 'file': i.file.url,
-                'delete': i.deleted
+                'delete': i.deleted,
+                'update_at': i.updated_at
             } for i in file
         ]
     
