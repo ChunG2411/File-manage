@@ -81,11 +81,11 @@ checkFormat(props.data.file)
             <div class="preveiw-slot" v-else-if="file_format == 'video'">
                 <video :src="store.api + props.data.file" controls autoplay></video>
             </div>
-            <div class="preveiw-slot" v-else-if="file_format == 'pdf'">
-                <object :data="store.api + props.data.file" width="800" height="500"></object>
-            </div>
-            <div v-else>
+            <div v-else-if="file_format == 'file'">
                 <p>Không thể xem trước tệp tin này</p>
+            </div>
+            <div class="preveiw-slot" v-else>
+                <object :data="store.api + props.data.file" width="800" height="600">Không thể xem trước tệp tin này</object>
             </div>
         </div>
     </div>
@@ -124,7 +124,7 @@ checkFormat(props.data.file)
 
 .preveiw-slot {
     width: 800px;
-    height: 500px;
+    height: 600px;
 }
 
 img, video {

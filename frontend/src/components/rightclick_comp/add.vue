@@ -69,8 +69,7 @@ function addFile() {
         }
         return
     }
-    store.loading = true
-
+    
     const form = new FormData()
     form.append('parent', props.id)
     form.append('file', file.value)
