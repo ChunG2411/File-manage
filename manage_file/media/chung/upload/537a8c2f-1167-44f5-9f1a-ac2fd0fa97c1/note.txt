@@ -1,9 +1,0 @@
-test:
-	14.248.85.158 port 2210
-	vsp / vsp@1234
-real:
-	45.77.40.90
-	root / T5w@!owjf$KxDHp(
-app bike:
-	hungpv@vietsoftpro.com
-	141@hunter

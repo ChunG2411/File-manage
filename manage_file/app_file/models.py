@@ -49,6 +49,11 @@ class File(models.Model):
     class Meta:
         db_table = 'tb_file'
         verbose_name = 'Tập tin'
+    
+    def delete(self, *args, **kwargs):
+        storage, path = self.file.storage, self.file.path
+        super(File, self).delete(*args, **kwargs)
+        storage.delete(path)
 
 
 class Saved(models.Model):

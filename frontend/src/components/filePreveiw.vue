@@ -1,17 +1,23 @@
 <script setup>
 import { ref, defineProps, watch } from 'vue'
+import axios from 'axios'
 
 import Store from '../utils/store.js'
+import pdf from '../assets/image/pdf.png'
 
 
 const props = defineProps({
-    src: String
+    src: String,
+    id: String
 })
 
 const store = Store()
 const file_format = ref(null)
+const file_url = ref(null)
+
 
 watch(()=>props.src, (newValue, _)=>{
+    file_url.value = null
     checkFormat(newValue)
 })
 
@@ -20,6 +26,7 @@ function checkFormat(name) {
 
     if(['gif', 'jpeg', 'jpg', 'png'].includes(end)){
         file_format.value = 'image'
+        file_url.value = `${store.api}${props.src}`
     }
     else if(['rar', 'zip'].includes(end)){
         file_format.value = 'zip'
@@ -35,9 +42,11 @@ function checkFormat(name) {
     }
     else if(['mp4'].includes(end)){
         file_format.value = 'video'
+        file_url.value = `${store.api}${props.src}`
     }
     else if(['pdf'].includes(end)){
         file_format.value = 'pdf'
+        getPreview()
     }
     else {
         file_format.value = 'file'
@@ -45,17 +54,28 @@ function checkFormat(name) {
 }
 checkFormat(props.src)
 
+
+function getPreview() {
+    axios.get(`${store.api}/api/file/${props.id}/preview`, store.header)
+        .then(response => {
+            file_url.value = `${store.api}${response.data}`
+        })
+        .catch(_ => {
+            file_url.value = pdf
+        })
+}
+
 </script>
 
 <template>
     <div class="file-preview">
-        <img :src="`${store.api}${props.src}`" v-if="file_format == 'image'"/>
+        <img :src="file_url" v-if="file_format == 'image'"/>
         <img src="../assets/image/doc.png" v-else-if="file_format == 'doc'"/>
         <img src="../assets/image/zip.png" v-else-if="file_format == 'zip'"/>
         <img src="../assets/image/xls.png" v-else-if="file_format == 'xls'"/>
         <img src="../assets/image/ppt.png" v-else-if="file_format == 'ppt'"/>
-        <img src="../assets/image/video.png" v-else-if="file_format == 'video'"/>
-        <img src="../assets/image/pdf.png" v-else-if="file_format == 'pdf'"/>
+        <video :src="file_url" v-else-if="file_format == 'video'"></video>
+        <img :src="file_url" v-else-if="file_format == 'pdf'"/>
         <img src="../assets/image/file.png" v-else/>
     </div>
 </template>
@@ -67,13 +87,13 @@ checkFormat(props.src)
     overflow: hidden;
     display: flex;
     justify-content: center;
-    border-radius: 10px;
+    border-radius: 5px;
 }
 
-.file-preview img{
+:where(.file-preview) img, video{
     height: 100%;
     width: 100%;
-    object-fit: contain;
+    object-fit: cover;
 }
 
 @media screen and (max-width: 550px) {

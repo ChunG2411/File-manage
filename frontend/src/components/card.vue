@@ -34,6 +34,7 @@ const filter_time = reactive({
     time: '',
     label: ''
 })
+const selected = ref([])
 
 const right_click = reactive({
     status: false,
@@ -58,6 +59,8 @@ watch(() => store.reload, (newValue, _) => {
         filter_ext.label = ''
         filter_time.time = ''
         filter_time.label = ''
+        selected.value = []
+        removeSelect()
         getData(route.path)
     }
 })
@@ -67,6 +70,8 @@ watch(() => route.path, (newId, oldId) => {
     filter_ext.label = ''
     filter_time.time = ''
     filter_time.label = ''
+    selected.value = []
+    removeSelect()
     getData(newId)
 })
 
@@ -142,6 +147,7 @@ getData(route.path)
 
 
 function getFolder(id) {
+    right_click.status = false
     router.push({ name: 'card_folder', params: { id } })
 }
 
@@ -260,6 +266,64 @@ function changeFilterTime(time, label) {
     filter_time.label = label
 }
 
+function selectItem(event, type, item) {
+    if (event.currentTarget.classList.contains('item-selected')) {
+        event.currentTarget.classList.remove('item-selected')
+        selected.value = selected.value.filter(select => select.item.id !== item.id)
+    }
+    else {
+        event.currentTarget.classList.add('item-selected')
+        selected.value.push({
+            type: type,
+            item: item
+        })
+    }
+}
+
+function removeSelect() {
+    selected.value = []
+    document.querySelectorAll('.item-selected').forEach(item => {
+        item.classList.remove('item-selected')
+    })
+}
+
+function selectAll() {
+    removeSelect()
+    document.querySelectorAll('.item').forEach(item => {
+        if (!item.classList.contains('item-selected')) {
+            item.classList.add('item-selected')
+        }
+    })
+    data.value.folder.forEach(item => {
+        selected.value.push({
+            type: 'folder',
+            item: item
+        })
+    })
+    data.value.file.forEach(item => {
+        selected.value.push({
+            type: 'file',
+            item: item
+        })
+    })
+}
+
+function deleteSelect() {
+    selected.value.forEach(item => {
+        axios.delete(`${store.api}/api/${item.type}/${item.item.id}`, store.header)
+            .then(response => {
+                store.toast = {
+                    title: 'success',
+                    content: 'Xoá thành công'
+                }
+                store.reload = true
+            })
+            .catch(error => {
+                checkError(error)
+            })
+    })
+}
+
 </script>
 
 
@@ -297,7 +361,12 @@ function changeFilterTime(time, label) {
                     <!-- icon -->
                 </div>
             </div>
-            <div class="d-flex gap-3 p-2 mt-2">
+            <div class="d-flex gap-3 p-2 mt-2" v-if="selected.length > 0">
+                <button class="btn btn-outline-primary" @click="selectAll">Chọn tất cả</button>
+                <button @click="removeSelect">Bỏ chọn</button>
+                <button class="btn btn-outline-danger" @click="deleteSelect">Xoá</button>
+            </div>
+            <div class="d-flex gap-3 p-2 mt-2" v-else>
                 <div class="btn-drop">
                     <button>
                         <p>Thêm mới</p>
@@ -392,7 +461,7 @@ function changeFilterTime(time, label) {
             <p class="mt-2 mb-2">Thư mục</p>
             <div class="list-item">
                 <div class="item" v-for="(i, index) in data.folder" @dblclick="getFolder(i.id)"
-                    @mouseup.right="showMenu($event, 'folder', i)">
+                    @mouseup.right="showMenu($event, 'folder', i)" @click="selectItem($event, 'folder', i)">
                     <div class="item-header">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                             stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round">
@@ -414,7 +483,7 @@ function changeFilterTime(time, label) {
             <p class="mt-4 mb-2">Tệp</p>
             <div class="list-item">
                 <div class="item" v-for="(i, index) in data.file" @dblclick="showPreveiwFunc(i)"
-                    @mouseup.right="showMenu($event, 'file', i)">
+                    @mouseup.right="showMenu($event, 'file', i)" @click="selectItem($event, 'file', i)">
                     <div class="item-header">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                             stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round">
@@ -430,7 +499,7 @@ function changeFilterTime(time, label) {
                             <circle cx="12" cy="19" r="1"></circle>
                         </svg>
                     </div>
-                    <FilePreveiw :src="i.file"></FilePreveiw>
+                    <FilePreveiw :src="i.file" :id="i.id"></FilePreveiw>
                 </div>
             </div>
         </div>
@@ -438,6 +507,9 @@ function changeFilterTime(time, label) {
 
     <!-- --------------------------------------------right click------------------------------------------------------- -->
     <div class="rightclick" ref="right_card" v-on-click-outside="closeMenu" v-show="right_click.status">
+        <div class="right-tab-1 item-right" @click="(right_click.type=='folder') ? getFolder(right_click.data.id) : showPreveiwFunc(right_click.data)">
+            <p>Mở</p>
+        </div>
         <div class="right-tab-1 item-right" @click="showComponent('infor')">
             <p>Xem thông tin</p>
         </div>
@@ -614,6 +686,13 @@ function changeFilterTime(time, label) {
     background-color: var(--hover_color);
 }
 
+.item-selected {
+    background-color: var(--active_background_color);
+}
+.item-selected:hover {
+    background-color: var(--active_background_color);
+}
+
 .item-header {
     width: 100%;
     display: flex;
@@ -632,6 +711,7 @@ function changeFilterTime(time, label) {
     height: max-content;
     display: flex;
     flex-direction: column;
+    min-width: 170px;
 }
 
 .item-right {

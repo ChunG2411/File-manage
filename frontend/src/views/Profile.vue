@@ -142,6 +142,10 @@ function submitInfor() {
             modify_form.avatar = ''
             
             store.loading = false
+            store.toast = {
+                title: 'success',
+                content: 'Cập nhật thành công'
+            }
         })
         .catch(error => {
             checkError(error)

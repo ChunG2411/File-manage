@@ -22,7 +22,7 @@ def get_path_url(obj, path=[]):
 
 
 def get_path_file(path):
-    path = path.split('media/')[-1]
+    path = path.split('media/')[-1].replace('/', '\\')
     return os.path.join(settings.MEDIA_ROOT, path)
 
 

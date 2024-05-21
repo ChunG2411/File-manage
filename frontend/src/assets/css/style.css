@@ -41,6 +41,7 @@
   --card_border_color: #6f6f6f82;
 
   --item_color: #232323;
+  --item_color_selected: #3a3a3a;
   --text_color: #ffffff;
   --hover_color: #3a3a3a;
   --text_background_red: #ff7070;
@@ -274,7 +275,7 @@ button {
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
-  font-size: 15px;
+  font-size: 16px;
   padding: 5px 10px;
   width: max-content;
   height: max-content;
@@ -312,6 +313,10 @@ button:hover {
 
 .btn-drop-item:hover {
   background-color: var(--hover_color);
+}
+
+.btn {
+  padding: 5px 10px;
 }
 
 /* ----------------------------responsive------------------------------- */

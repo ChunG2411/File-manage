@@ -1,6 +1,6 @@
 <script setup>
 import axios from 'axios'
-import { ref } from 'vue';
+import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import Store from '../utils/store.js'
@@ -12,6 +12,12 @@ const router = useRouter()
 
 const showComp = ref('')
 
+
+watch(() => store.reload, (newValue, _) => {
+    if (newValue) {
+        getLimit()
+    }
+})
 
 async function getLimit() {
     store.loading = true

@@ -322,11 +322,15 @@ function setLang(lang) {
 }
 
 @media screen and (max-width: 550px) {
-    .header-logo {
+    .header-logo h4 {
         display: none;
     }
+    .logo {
+        max-width: 35px;
+        min-width: 35px;
+    }
     .search {
-        width: 70%;
+        width: 60%;
     }
 }
 </style>

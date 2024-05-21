@@ -1,3 +1,4 @@
+import os
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import permissions
@@ -8,6 +9,7 @@ from .models import Folder, File, Saved
 from .serializers import FolderSerializers, FileSerializers, FolderDetailSerializer
 from manage_file.function import check_validate, get_path_file, check_token_blacklisted
 from app_user.models import Profile, LimitAction
+from .task import convertFile
 
 # Create your views here.
 
@@ -156,6 +158,7 @@ class FileView(APIView):
                                    file=file_upload, size=size,
                                    parent=folder, created_by=request.user)
         limit.save()
+        convertFile.delay(file.file.url, str(file.id))
         return Response(FileSerializers(file, context={'request': request}).data, status=200)
 
     def delete(self, request, id):
@@ -259,6 +262,17 @@ def downloadFile(request, id):
         return response
     else:
         return Response("You don't have permission", status=402)
+
+
+@api_view(['GET'])
+def previewFile(request, id):
+    file = File.objects.get(id=id)
+    path_folder = get_path_file(file.file.url).rsplit('\\', 1)[0]
+    path_file = os.path.join(path_folder, f'file-{file.id}.png')
+    if os.path.isfile(path_file):
+        return Response(file.file.url.rsplit('/', 1)[0] + f'/file-{file.id}.png', status=200)
+    else:
+        return Response("File haven't preview", status=400)
 
 
 @permission_classes([permissions.IsAuthenticated])
