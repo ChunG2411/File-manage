@@ -58,7 +58,7 @@ function submit() {
 }
 
 function copyLink(e) {
-    const url = `http://localhost:5173/file/${props.id}`
+    const url = `http://localhost:5173/${props.type}/${props.id}`
     navigator.clipboard.writeText(url)
     e.target.innerHTML = 'Đã sao chép'
 }

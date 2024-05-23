@@ -94,6 +94,10 @@ body {
   cursor: pointer;
 }
 
+.right-0 {
+  right: 0;
+}
+
 ::-webkit-scrollbar {
   width: 5px;
 }
@@ -347,6 +351,7 @@ button:hover {
 
   button {
     font-size: 0.8rem!important;
+    padding: 5px 7px;
   }
 
   input, select, .input-group-text {

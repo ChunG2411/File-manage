@@ -7,7 +7,7 @@ from django.http import FileResponse
 
 from .models import Folder, File, Saved
 from .serializers import FolderSerializers, FileSerializers, FolderDetailSerializer
-from manage_file.function import check_validate, get_path_file, check_token_blacklisted
+from manage_file.function import check_validate, get_path_file
 from app_user.models import Profile, LimitAction
 from .task import convertFile
 
@@ -15,7 +15,6 @@ from .task import convertFile
 
 
 @permission_classes([permissions.IsAuthenticated])
-@check_token_blacklisted
 class FolderView(APIView):
     def get(self, request, id):
         folder = Folder.objects.get(id=id)
@@ -75,7 +74,6 @@ class FolderView(APIView):
 
 
 @permission_classes([permissions.IsAuthenticated])
-@check_token_blacklisted
 class FolderDetailView(APIView):
     def get(self, request, id):
         folder = Folder.objects.get(id=id)
@@ -130,7 +128,6 @@ class FolderDetailView(APIView):
 
 
 @permission_classes([permissions.IsAuthenticated])
-@check_token_blacklisted
 class FileView(APIView): 
     def post(self, request):
         parent = request.data.get('parent')
@@ -193,7 +190,6 @@ class FileView(APIView):
 
 
 @permission_classes([permissions.IsAuthenticated])
-@check_token_blacklisted
 class FileDetailView(APIView):
     def get(self, request, id):
         file = File.objects.get(id=id)
@@ -276,7 +272,6 @@ def previewFile(request, id):
 
 
 @permission_classes([permissions.IsAuthenticated])
-@check_token_blacklisted
 class HomeView(APIView):
     def get(self, request):
         type = request.query_params.get('type')
@@ -316,7 +311,6 @@ class HomeView(APIView):
 
 
 @permission_classes([permissions.IsAuthenticated])
-@check_token_blacklisted
 class SearchView(APIView):
     def get(self, request):
         search = request.query_params.get('search')

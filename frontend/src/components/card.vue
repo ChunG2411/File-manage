@@ -97,6 +97,10 @@ watch(() => filter_ext.ext, (newValue, _) => {
         data.value.folder = []
         data.value.file = data.value.file.filter((item) => ['gif', 'jpeg', 'jpg', 'png'].includes(item.file.split('.').at(-1)))
     }
+    else if (newValue == 'mp4') {
+        data.value.folder = []
+        data.value.file = data.value.file.filter((item) => ['mp4'].includes(item.file.split('.').at(-1)))
+    }
     else if (newValue == 'ppt') {
         data.value.folder = []
         data.value.file = data.value.file.filter((item) => ['ppt', 'pptx'].includes(item.file.split('.').at(-1)))
@@ -370,7 +374,7 @@ function deleteSelect() {
                 <div class="btn-drop">
                     <button>
                         <p>Thêm mới</p>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none"
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" fill="none"
                             stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round">
                             <path d="M6 9l6 6 6-6" />
                         </svg>
@@ -387,12 +391,12 @@ function deleteSelect() {
                 <div class="btn-drop">
                     <button>
                         <p>{{ filter_ext.label ? filter_ext.label : 'Loại' }}</p>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none"
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" fill="none"
                             stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round"
                             v-if="filter_ext.ext==''">
                             <path d="M6 9l6 6 6-6" />
                         </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 20 20" fill="none"
                             stroke="#4f4f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             v-else @click="changeFilterExt('', 'Loại')">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -415,6 +419,9 @@ function deleteSelect() {
                         <div class="btn-drop-item" @click="changeFilterExt('png', 'Ảnh')">
                             <p>Ảnh</p>
                         </div>
+                        <div class="btn-drop-item" @click="changeFilterExt('mp4', 'Đoạn phim')">
+                            <p>Đoạn phim</p>
+                        </div>
                         <div class="btn-drop-item" @click="changeFilterExt('ppt', 'Trình bày')">
                             <p>Trình bày</p>
                         </div>
@@ -426,12 +433,12 @@ function deleteSelect() {
                 <div class="btn-drop">
                     <button>
                         <p>{{ filter_time.label ? filter_time.label : 'Gần đây' }}</p>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none"
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" fill="none"
                             stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round"
                             v-if="filter_time.time==''">
                             <path d="M6 9l6 6 6-6" />
                         </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 20 20" fill="none"
                             stroke="#4f4f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             v-else @click="changeFilterTime('', 'Gần đây')">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -463,11 +470,19 @@ function deleteSelect() {
                 <div class="item" v-for="(i, index) in data.folder" @dblclick="getFolder(i.id)"
                     @mouseup.right="showMenu($event, 'folder', i)" @click="selectItem($event, 'folder', i)">
                     <div class="item-header">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                            stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round">
-                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z">
-                            </path>
-                        </svg>
+                        <div class="d-flex align-items-center position-relative">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                                stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z">
+                                </path>
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                stroke="#4f4f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="position-absolute" style="bottom: 2px; left: 1px" v-if="i.permissions=='1'">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
                         <p>{{ (i.name.length > 10) ? i.name.slice(0, 10) + '...' : i.name }}</p>
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                             stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round"
@@ -485,11 +500,19 @@ function deleteSelect() {
                 <div class="item" v-for="(i, index) in data.file" @dblclick="showPreveiwFunc(i)"
                     @mouseup.right="showMenu($event, 'file', i)" @click="selectItem($event, 'file', i)">
                     <div class="item-header">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                            stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round">
-                            <path d="M13 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V9l-7-7z" />
-                            <path d="M13 3v6h6" />
-                        </svg>
+                        <div class="d-flex align-items-center position-relative">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round">
+                                <path d="M13 2H6a2 2 0 0 0-2 2v16c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2V9l-7-7z" />
+                                <path d="M13 3v6h6" />
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                stroke="#4f4f4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                class="position-absolute" style="bottom: 2px; left: 3px" v-if="i.permissions=='1'">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
                         <p>{{ (i.name.length > 10) ? i.name.slice(0, 7) + '...' : i.name }}</p>
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                             stroke="#4f4f4f" stroke-width="2" stroke-linecap="square" stroke-linejoin="round"
@@ -762,12 +785,16 @@ function deleteSelect() {
 
 @media screen and (max-width: 550px) {
     .item {
-        min-width: 140px;
-        max-width: 140px;
+        min-width: 150px;
+        max-width: 150px;
+        padding: 8px 10px;
     }
     .card {
         height: calc(100% - 100px);
         max-height: calc(100% - 100px);
+    }
+    .card-content {
+        padding: 5px;
     }
 }
 </style>

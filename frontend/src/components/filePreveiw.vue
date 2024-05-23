@@ -99,7 +99,7 @@ function getPreview() {
 @media screen and (max-width: 550px) {
     .file-preview {
         width: 100px;
-        height: 70px;
+        height: 80px;
     }
 }
 </style>
